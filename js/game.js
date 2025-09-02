@@ -25,12 +25,16 @@ class ParkingGame {
         this.level = new Level(levelNumber);
         this.car = new Car(this.level.startPosition.x, this.level.startPosition.y, this.level.startAngle);
         this.gameState = 'playing';
-        document.getElementById('current-level').textContent = levelNumber;
+        document.getElementById('level-select').value = levelNumber;
     }
 
     setupEventListeners() {
         document.getElementById('restart-btn').addEventListener('click', () => {
             this.loadLevel(this.currentLevel);
+        });
+
+        document.getElementById('level-select').addEventListener('change', (e) => {
+            this.loadLevel(parseInt(e.target.value));
         });
 
         // Prevent default touch behaviors
@@ -106,6 +110,7 @@ class ParkingGame {
                 carBounds.bottom <= exitArea.bottom + 5;
 
             if (positionCheck) {
+                this.playExitSound();
                 this.gameState = 'completed';
                 this.nextLevel();
             }
@@ -131,6 +136,25 @@ class ParkingGame {
         oscillator.stop(audioContext.currentTime + 0.3);
     }
 
+    playExitSound() {
+        // Simple beep sound using Web Audio API
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(400, audioContext.currentTime + 0.1);
+
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+    }
+
     showSuccessEffect() {
         // Simple visual effect
         this.ctx.save();
@@ -141,6 +165,7 @@ class ParkingGame {
 
     nextLevel() {
         this.currentLevel++;
+        document.getElementById('level-select').value = this.currentLevel;
         if (this.currentLevel <= 5) { // Assuming 5 levels
             setTimeout(() => {
                 this.loadLevel(this.currentLevel);

@@ -108,21 +108,23 @@ class Level {
     }
 
     generateLevel3() {
-        // Narrow space
+        // Realistic parking lot with parallel parked cars
         this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 },
-            { left: 0, right: 50, top: 0, bottom: 600 },
-            { left: 750, right: 800, top: 0, bottom: 600 },
-            { left: 0, right: 800, top: 550, bottom: 600 },
-            { left: 250, right: 300, top: 150, bottom: 450 },
-            { left: 500, right: 550, top: 150, bottom: 450 },
-            { left: 320, right: 380, top: 200, bottom: 400 },
-            { left: 420, right: 480, top: 200, bottom: 400 }
+            { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+            { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+            { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+            // Parked cars as obstacles
+            { left: 330, right: 370, top: 250, bottom: 350 }, // Left parked car
+            { left: 430, right: 470, top: 250, bottom: 350 }, // Right parked car
+            // Additional parked cars for realism
+            { left: 280, right: 320, top: 250, bottom: 350 }, // Another left car
+            { left: 480, right: 520, top: 250, bottom: 350 }  // Another right car
         ];
 
         this.parkingSpot = {
-            left: 380,
-            right: 420,
+            left: 360,
+            right: 440,
             top: 250,
             bottom: 350,
             angle: -Math.PI / 2
@@ -173,38 +175,33 @@ class Level {
     }
 
     generateLevel5() {
-        // Very challenging: multiple obstacles, tight spaces
+        // Parallel parking scenario on the side of a street
         this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 },
-            { left: 0, right: 50, top: 0, bottom: 600 },
-            { left: 750, right: 800, top: 0, bottom: 600 },
-            { left: 0, right: 800, top: 550, bottom: 600 },
-            { left: 120, right: 170, top: 80, bottom: 280 },
-            { left: 630, right: 680, top: 320, bottom: 520 },
-            { left: 280, right: 330, top: 120, bottom: 220 },
-            { left: 470, right: 520, top: 380, bottom: 480 },
-            { left: 350, right: 400, top: 200, bottom: 300 },
-            { left: 200, right: 250, top: 350, bottom: 450 },
-            { left: 550, right: 600, top: 150, bottom: 250 }
+            { left: 0, right: 800, top: 0, bottom: 50 }, // Top road boundary
+            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom road boundary
+            { left: 750, right: 800, top: 0, bottom: 600 }, // Right curb
+            // Parked cars on the right
+            { left: 650, right: 700, top: 150, bottom: 250 }, // First parked car
+            { left: 650, right: 700, top: 350, bottom: 450 }  // Second parked car
         ];
 
         this.parkingSpot = {
-            left: 400,
-            right: 430,
-            top: 285,
-            bottom: 315,
-            angle: -Math.PI / 2 // Face up
+            left: 650,
+            right: 700,
+            top: 250,
+            bottom: 350,
+            angle: 0 // Face right
         };
 
         this.exitArea = {
-            left: 700,
-            right: 750,
-            top: 285,
-            bottom: 315
+            left: 0,
+            right: 50,
+            top: 250,
+            bottom: 350
         };
 
         this.startPosition = { x: 100, y: 300 };
-        this.startAngle = -Math.PI / 2;
+        this.startAngle = 0; // Face right
     }
 
     render(ctx) {
