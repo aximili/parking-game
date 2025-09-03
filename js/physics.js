@@ -161,32 +161,32 @@ class Car {
         // Draw car SVG image with proper scaling and positioning
         ctx.drawImage(this.image, -this.height / 2, -this.width / 2, this.height, this.width);
 
-        // Draw front wheels
+        // Draw wheels
         ctx.fillStyle = 'black';
 
         // Left front wheel
         ctx.save();
-        ctx.translate(0.2 * this.height, -0.37 * this.width);
-        ctx.rotate(this.steeringAngle);
+        ctx.translate(0.25 * this.height, -0.5 * this.width);
+        ctx.rotate(this.steeringAngle * 0.8);
         ctx.fillRect(-4, -2, 8, 4);
         ctx.restore();
 
         // Right front wheel
         ctx.save();
-        ctx.translate(0.2 * this.height, 0.37 * this.width);
-        ctx.rotate(this.steeringAngle);
+        ctx.translate(0.25 * this.height, 0.5 * this.width);
+        ctx.rotate(this.steeringAngle * 0.8);
         ctx.fillRect(-4, -2, 8, 4);
         ctx.restore();
 
         // Left rear wheel
         ctx.save();
-        ctx.translate(-0.2 * this.height, -0.37 * this.width);
+        ctx.translate(-0.27 * this.height, -0.5 * this.width);
         ctx.fillRect(-4, -2, 8, 4);
         ctx.restore();
 
         // Right rear wheel
         ctx.save();
-        ctx.translate(-0.2 * this.height, 0.37 * this.width);
+        ctx.translate(-0.27 * this.height, 0.5 * this.width);
         ctx.fillRect(-4, -2, 8, 4);
         ctx.restore();
 

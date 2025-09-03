@@ -7,20 +7,18 @@
   </defs>
 
   <!-- Car body -->
-  <rect x="10" y="10" width="80" height="40" rx="5" ry="5" fill="url(#carBody)" stroke="#FFFFFF" stroke-width="2"/>
-
-  <!-- Wheels -->
-  <!-- Headlights -->
-
-  <!-- Headlights -->
-  <circle cx="15" cy="20" r="3" fill="#FFFF00"/>
-  <circle cx="85" cy="20" r="3" fill="#FFFF00"/>
-
-  <!-- Taillights -->
-  <circle cx="15" cy="40" r="3" fill="#FF0000"/>
-  <circle cx="85" cy="40" r="3" fill="#FF0000"/>
+  <rect x="2" y="2" width="96" height="56" rx="5" ry="5" fill="url(#carBody)" stroke="#FFFFFF" stroke-width="2"/>
 
   <!-- Direction indicators -->
-  <circle cx="5" cy="30" r="4" fill="#FFA500" opacity="0.8"/>
-  <circle cx="95" cy="30" r="4" fill="#FFA500" opacity="0.8"/>
+  <circle cx="94" cy="6" r="5" fill="#FFA500" opacity="0.8"/>
+  <circle cx="94" cy="54" r="5" fill="#FFA500" opacity="0.8"/>
+
+  <!-- Headlights -->
+  <circle cx="95" cy="12" r="4" fill="#FFFF00"/>
+  <circle cx="95" cy="48" r="4" fill="#FFFF00"/>
+
+  <!-- Taillights -->
+  <rect x="0" y="5" width="4" height="12" rx="2" ry="2" fill="#FF0000"/>
+  <rect x="0" y="43" width="4" height="12" rx="2" ry="2" fill="#FF0000"/>
+
 </svg>
