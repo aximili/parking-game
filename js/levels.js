@@ -114,19 +114,24 @@ class Level {
             { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
             { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
             { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
             // Parked cars as obstacles
-            { left: 330, right: 370, top: 250, bottom: 350 }, // Left parked car
-            { left: 430, right: 470, top: 250, bottom: 350 }, // Right parked car
+            { left: 250, right: 290, top: 100, bottom: 200 }, // Left parked car
+            { left: 380, right: 420, top: 100, bottom: 200 }, // Right parked car
+
             // Additional parked cars for realism
-            { left: 280, right: 320, top: 250, bottom: 350 }, // Another left car
-            { left: 480, right: 520, top: 250, bottom: 350 }  // Another right car
+            { left: 190, right: 230, top: 100, bottom: 200 }, // Another left car
+            { left: 440, right: 480, top: 100, bottom: 200 },  // Another right car
+
+            // Side of road
+            { left: 180, right: 500, top: 260, bottom: 280 },
         ];
 
         this.parkingSpot = {
-            left: 360,
-            right: 440,
-            top: 250,
-            bottom: 350,
+            left: 310,
+            right: 360,
+            top: 100,
+            bottom: 200,
             angle: -Math.PI / 2
         };
 
