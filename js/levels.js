@@ -40,6 +40,9 @@ class Level {
             case 5:
                 this.generateLevel5();
                 break;
+            case 6:
+                this.generateLevel6();
+                break;
             default:
                 this.generateLevel1();
         }
@@ -72,7 +75,8 @@ class Level {
             bottom: 350
         };
 
-        this.startPosition = { x: 100, y: 300 };
+        //this.startPosition = { x: 100, y: 300 };
+        this.startPosition = { x: 50, y: 50 };
         this.startAngle = -Math.PI / 2;
     }
 
@@ -182,9 +186,14 @@ class Level {
     generateLevel5() {
         // Parallel parking scenario on the side of a street
         this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 }, // Top road boundary
-            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom road boundary
-            { left: 750, right: 800, top: 0, bottom: 600 }, // Right curb
+            { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+            { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+            { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
+            // Middle wall
+            { left: 540, right: 580, top: 110, bottom: 490 },
+
             // Parked cars on the right
             { left: 650, right: 700, top: 150, bottom: 250 }, // First parked car
             { left: 650, right: 700, top: 350, bottom: 450 }  // Second parked car
@@ -195,18 +204,62 @@ class Level {
             right: 700,
             top: 250,
             bottom: 350,
-            angle: 0 // Face right
         };
 
         this.exitArea = {
-            left: 0,
-            right: 50,
+            left: 50,
+            right: 100,
             top: 250,
             bottom: 350
         };
 
-        this.startPosition = { x: 100, y: 300 };
+        this.startPosition = { x: 150, y: 300 };
         this.startAngle = 0; // Face right
+    }
+
+    generateLevel6() {
+        // by Isko
+        this.boundaries = [
+            { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+            { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+            { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
+            // Obstacles
+            { left: 50, right: 150, top: 350, bottom: 380 },
+            { left: 120, right: 150, top: 350, bottom: 490 },
+            { left: 210, right: 250, top: 450, bottom: 550 },
+            { left: 210, right: 250, top: 300, bottom: 400 },
+            { left: 310, right: 350, top: 150, bottom: 250 },
+
+            { left: 200, right: 350, top: 100, bottom: 150 },
+            { left: 200, right: 240, top: 150, bottom: 250 },
+            { left: 310, right: 350, top: 400, bottom: 450 },
+            { left: 350, right: 390, top: 50, bottom: 100 },
+            { left: 460, right: 590, top: 100, bottom: 460 },
+
+            { left: 590, right: 650, top: 460, bottom: 550 },
+            { left: 650, right: 750, top: 300, bottom: 390 },
+            { left: 650, right: 750, top: 100, bottom: 190 },
+        ];
+
+        this.parkingSpot = {
+            left: 240,
+            right: 310,
+            top: 150,
+            bottom: 250,
+            angle: 0 // Face right (doesn't work)
+        };
+
+        this.exitArea = {
+            left: 650,
+            right: 750,
+            top: 500,
+            bottom: 550,
+        };
+
+        this.startPosition = { x: 80, y: 420 };
+        this.startAngle = -Math.PI / 2; // Face North
     }
 
     render(ctx) {
