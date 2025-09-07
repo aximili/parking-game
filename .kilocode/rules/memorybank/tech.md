@@ -31,9 +31,10 @@
 - **Game Loop:** `requestAnimationFrame` for smooth animation, with delta-time calculations for frame-rate independence.
 - **Event Handling:** Direct DOM event listeners for inputs and UI (e.g., level select change, restart button click); preventDefault on touch/keyboard to avoid scrolling/zoom.
 - **Image Loading:** Asynchronous `new Image()` with `src` assignment; check `complete` before drawing, fallback to canvas primitives.
-- **Physics Updates:** Fixed timestep fallback (1/60s) if deltaTime invalid; exponential decay for friction.
+- **Physics Updates:** Fixed timestep fallback (1/60s) if deltaTime invalid; exponential decay for friction. SAT (Separating Axis Theorem) implementation for collision detection: project() for shape projections, getAxes() for obstacle axes, axesOverlap() for overlap checks, checkSATCollision() for full detection using car corners from Car.getCorners(). Collision response sets velocity=0 without MTV-based pushAway.
 - **State Management:** String-based FSM in `ParkingGame` for transitions; timeouts for delays (e.g., parked to exiting).
 - **Debugging:** Console.log for success events; no formal logging framework.
 - **Extension Points:** Add new levels by extending `Level` class switch cases; new features via composition in `ParkingGame` (e.g., add Timer class).
+- **Script Loading Dependency Order:** Scripts loaded in specific order via <script> tags in index.html: game.js first (core orchestrator), then physics.js (depends on game), controls.js, levels.js to ensure dependencies resolve without timing issues.
 
 This setup ensures the game is quick to develop, test, and deploy while maintaining high performance and broad compatibility.

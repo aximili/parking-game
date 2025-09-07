@@ -6,8 +6,8 @@ The game is a single-page browser application built with vanilla JavaScript, HTM
 ## Source Code Paths
 - `index.html`: Entry point - sets up DOM structure (UI, canvas, mobile controls) and loads JS modules in order.
 - `css/style.css`: Responsive styling with glassmorphism effects, media queries for mobile.
-- `js/game.js`: Main orchestrator - `ParkingGame` class handles initialization, game loop, state management, event listeners, and rendering.
-- `js/physics.js`: Physics simulation - `CarPhysics` and `Car` classes manage movement, steering, collisions.
+- `js/game.js`: Main orchestrator - `ParkingGame` class handles initialization, game loop, state management, event listeners, and rendering. Includes corrected parameter passing to physics and controls.
+- `js/physics.js`: Physics simulation - `CarPhysics` and `Car` classes manage movement, steering, and collisions using Separating Axis Theorem (SAT) for accurate detection with rotated car vs axis-aligned obstacles.
 - `js/controls.js`: Input handling - `GameControls` class processes keyboard and touch events.
 - `js/levels.js`: Level data and rendering - `Level` class defines boundaries, spots, and draws elements using SVG or fallbacks.
 - `assets/*.svg`: Visual assets for car, obstacles, parking spot, exit, road - scalable vector graphics.
@@ -15,15 +15,15 @@ The game is a single-page browser application built with vanilla JavaScript, HTM
 The project structure is flat: root contains index.html, css/ and js/ directories, and assets/. No server-side or backend components.
 
 ## Key Technical Decisions
-- **Modular JS Loading:** Scripts loaded via <script> tags in specific order to ensure dependencies (e.g., game.js first, then physics.js, etc.).
+- **Modular JS Loading:** Scripts loaded via <script> tags in specific order to ensure dependencies (e.g., game.js first, then physics.js, etc.); fixed loading order in index.html to prevent timing issues.
 - **Canvas Rendering:** 2D context for efficient drawing with transformations (translate, rotate) for car orientation.
-- **Physics Model:** Bicycle model for steering (turn radius based on wheelbase and steering angle); AABB collision for simplicity and speed; no full physics engine to keep it lightweight.
+- **Physics Model:** Bicycle model for steering (turn radius based on wheelbase and steering angle); SAT (Separating Axis Theorem) collision detection for rotated car vs axis-aligned obstacles, with projection and axes overlap checks; simplified response to velocity=0 on collision without MTV-based pushAway to prevent unnatural warping.
 - **Input Smoothing:** Gradual ramping of control states (0-1) for responsive yet precise handling.
 - **State Management:** Simple finite state machine (FSM) with string states ('playing', 'parked', etc.) to control progression and UI updates.
 - **Asset Fallbacks:** SVG images with canvas-drawn alternatives (rects, strokes) if loading fails.
 - **Audio:** Procedural generation using Web Audio API oscillators for beeps/crashes - no file dependencies.
 - **Device Detection:** User agent sniffing to toggle mobile controls; touch prevention on canvas to avoid scrolling.
-- **Performance:** Delta-time based updates with 60fps fallback; collision checks only on boundaries (not every frame for all objects).
+- **Performance:** Delta-time based updates with 60fps fallback; collision checks optimized using SAT only when necessary.
 
 ## Design Patterns in Use
 - **Object-Oriented Programming (OOP):** Classes encapsulate concerns (e.g., `Car` for position/rendering, `Level` for data/rendering).
@@ -48,13 +48,15 @@ graph TD
     E --> D
     A --> F[Canvas Context]
     A --> G[DOM Events]
+    B --> H[SAT Collision Detection]
+    E --> I[getCorners() for SAT]
 ```
 
 - `ParkingGame` initializes and coordinates all components.
 - `GameControls` feeds input to `CarPhysics`.
-- `CarPhysics` updates `Car` position/velocity using `Level` boundaries.
+- `CarPhysics` updates `Car` position/velocity using `Level` boundaries and SAT collision detection.
 - `Level` provides data for collision checks and rendering.
-- `Car` is updated by physics and rendered by `ParkingGame`.
+- `Car` is updated by physics, provides corners for SAT, and rendered by `ParkingGame`.
 - Rendering: `Level.render()` then `Car.render()` on canvas.
 - Audio/UI: Handled directly in `ParkingGame`.
 
@@ -62,8 +64,6 @@ graph TD
 - **Initialization Path:** DOMContentLoaded -> new ParkingGame() -> loadLevel() -> create Level/Car -> setupEventListeners() -> detectDevice() -> start gameLoop().
 - **Main Loop Path:** requestAnimationFrame -> update(deltaTime): controls.update() -> physics.update(car, controls, deltaTime, boundaries) -> checkCollisions() -> checkParkingSuccess()/checkExitSuccess() -> render(): clearCanvas() -> level.render() -> car.render() -> draw overlays.
 - **Input Path:** keydown/touchstart -> set pressed flags -> update() ramps to 1.0 -> physics applies acceleration/steering.
-- **Collision Path:** physics.update() -> for each boundary: checkCollision(AABB) -> if overlap: velocity=0, pushAway() based on min overlap axis.
+- **Collision Path:** physics.update() -> for each boundary: get car corners and obstacle axes -> project shapes onto axes using project() -> check axesOverlap() -> if no separating axis via checkSATCollision(): velocity=0 (simplified response, no pushAway).
 - **State Transition Path:** checkParkingSuccess() -> if position & low speed: state='parked', playSound, timeout to 'exiting' -> checkExitSuccess() -> if position: state='completed', nextLevel().
 - **Level Progression:** nextLevel() -> currentLevel++, if <=5: loadLevel() else show completion message.
-
-This architecture supports easy extension (e.g., add new levels to Level class) while keeping the core loop efficient.

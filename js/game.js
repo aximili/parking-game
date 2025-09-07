@@ -66,7 +66,7 @@ class ParkingGame {
         // Check collision with boundaries
         const carBounds = this.car.getBounds();
         for (const boundary of this.level.boundaries) {
-            if (this.physics.checkCollision(carBounds, boundary)) {
+            if (this.physics.checkCollision(this.car, boundary)) {
                 this.physics.handleCollision(this.car, boundary);
                 this.playCrashSound();
                 break; // Play sound once per collision check

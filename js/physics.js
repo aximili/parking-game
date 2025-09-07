@@ -1,4 +1,5 @@
 // Car physics engine
+
 class CarPhysics {
     constructor() {
         this.maxSpeed = 120; // pixels per second (reduced for better control)
@@ -67,48 +68,135 @@ class CarPhysics {
 
         // Check collision with boundaries
         for (const boundary of boundaries) {
-            if (this.checkCollision(car.getBounds(), boundary)) {
+            if (this.checkCollision(car, boundary)) {
                 car.velocity = 0;
-                this.pushAway(car, boundary);
             }
         }
     }
 
-    checkCollision(carBounds, boundary) {
-        // Simple AABB collision detection
-        return !(carBounds.right < boundary.left ||
+    // Project points onto an axis (unit vector)
+    project(points, axis) {
+        let min = Infinity;
+        let max = -Infinity;
+        for (const point of points) {
+            const proj = point.x * axis.x + point.y * axis.y;
+            if (proj < min) min = proj;
+            if (proj > max) max = proj;
+        }
+        return { min, max };
+    }
+
+    // Get axes for SAT: car's edge normals + AABB axes
+    getAxes(carCorners, boundary) {
+        const axes = [];
+
+        // Car's two unique edge axes (normals)
+        for (let i = 0; i < 2; i++) {
+            const p1 = carCorners[i];
+            const p2 = carCorners[(i + 1) % 4];
+            const edgeX = p2.x - p1.x;
+            const edgeY = p2.y - p1.y;
+            // Perpendicular (normal)
+            const axisX = -edgeY;
+            const axisY = edgeX;
+            const length = Math.sqrt(axisX * axisX + axisY * axisY);
+            if (length > 0) {
+                axes.push({ x: axisX / length, y: axisY / length });
+            }
+        }
+
+        // AABB axes (x and y)
+        axes.push({ x: 1, y: 0 });
+        axes.push({ x: 0, y: 1 });
+
+        return axes;
+    }
+
+    // Check for overlap on a single axis
+    axesOverlap(proj1, proj2) {
+        return !(proj1.max < proj2.min || proj2.max < proj1.min);
+    }
+
+    // SAT collision detection and MTV calculation
+    checkSATCollision(carCorners, boundary) {
+        const axes = this.getAxes(carCorners, boundary);
+
+        let minOverlap = Infinity;
+        let minAxis = null;
+
+        for (const axis of axes) {
+            // Project car corners
+            const carProj = this.project(carCorners, axis);
+
+            // Project AABB corners (simple for axis-aligned)
+            const aabbCorners = [
+                { x: boundary.left, y: boundary.top },
+                { x: boundary.right, y: boundary.top },
+                { x: boundary.right, y: boundary.bottom },
+                { x: boundary.left, y: boundary.bottom }
+            ];
+            const aabbProj = this.project(aabbCorners, axis);
+
+            if (!this.axesOverlap(carProj, aabbProj)) {
+                return { collision: false, mtv: null };
+            }
+
+            // Calculate overlap for MTV
+            const overlap = Math.min(carProj.max, aabbProj.max) - Math.max(carProj.min, aabbProj.min);
+            if (overlap < minOverlap) {
+                minOverlap = overlap;
+                minAxis = axis;
+            }
+        }
+
+        // Determine MTV direction (towards car center from AABB)
+        const carCenter = { x: (boundary.left + boundary.right) / 2, y: (boundary.top + boundary.bottom) / 2 }; // Wait, no: car center
+        const carCenterWorld = { x: this.x, y: this.y }; // Car's center
+        const aabbCenter = { x: (boundary.left + boundary.right) / 2, y: (boundary.top + boundary.bottom) / 2 };
+        const toCar = { x: carCenterWorld.x - aabbCenter.x, y: carCenterWorld.y - aabbCenter.y };
+        const dot = toCar.x * minAxis.x + toCar.y * minAxis.y;
+        const mtv = { x: minAxis.x * minOverlap * (dot > 0 ? 1 : -1), y: minAxis.y * minOverlap * (dot > 0 ? 1 : -1) };
+
+        return { collision: true, mtv };
+    }
+
+    checkCollision(car, boundary) {
+        console.log('About to call getCorners on car:', car);
+        console.log('Car instanceof Car:', car instanceof Car);
+        console.log('getCorners type:', typeof car.getCorners);
+        const carCorners = car.getCorners();
+        const aabbCorners = [
+            { x: boundary.left, y: boundary.top },
+            { x: boundary.right, y: boundary.top },
+            { x: boundary.right, y: boundary.bottom },
+            { x: boundary.left, y: boundary.bottom }
+        ];
+        // Quick AABB reject first
+        const carBounds = car.getBounds();
+        if (carBounds.right < boundary.left ||
             carBounds.left > boundary.right ||
             carBounds.bottom < boundary.top ||
-            carBounds.top > boundary.bottom);
+            carBounds.top > boundary.bottom) {
+            return false;
+        }
+        // Full SAT
+        return this.checkSATCollision(carCorners, boundary).collision;
     }
 
+    /*
     pushAway(car, boundary) {
-        const carBounds = car.getBounds();
-        const overlapX = Math.min(carBounds.right - boundary.left, boundary.right - carBounds.left);
-        const overlapY = Math.min(carBounds.bottom - boundary.top, boundary.bottom - carBounds.top);
-
-        if (overlapX > 0 && overlapY > 0) {
-            if (overlapX < overlapY) {
-                // Push in x direction
-                if (carBounds.left < boundary.left) {
-                    car.x -= overlapX;
-                } else if (carBounds.right > boundary.right) {
-                    car.x += overlapX;
-                }
-            } else {
-                // Push in y direction
-                if (carBounds.top < boundary.top) {
-                    car.y -= overlapY;
-                } else if (carBounds.bottom > boundary.bottom) {
-                    car.y += overlapY;
-                }
-            }
+        const carCorners = car.getCorners();
+        const satResult = this.checkSATCollision(carCorners, boundary);
+        if (satResult.collision && satResult.mtv) {
+            // Apply MTV to separate car from boundary
+            car.x += satResult.mtv.x;
+            car.y += satResult.mtv.y;
         }
     }
+    */
 
     handleCollision(car, boundary) {
         car.velocity = 0;
-        this.pushAway(car, boundary);
     }
 
     checkParking(carBounds, parkingSpot) {
@@ -143,10 +231,10 @@ class Car {
         this.image.src = 'assets/car.svg';
     }
 
-    getBounds() {
-        // Rotation-aware bounds: calculate actual AABB after rotation to match visual rendering
-        const halfLength = this.height / 2; // 25px along car length
-        const halfWidth = this.width / 2;   // 15px along car width
+    getCorners() {
+        // Return the four rotated corners of the car in world coordinates
+        const halfLength = this.height / 2;
+        const halfWidth = this.width / 2;
 
         // Four corners relative to car center, before rotation
         const corners = [
@@ -164,35 +252,27 @@ class Car {
             y: corner.x * sinA + corner.y * cosA
         }));
 
-        // Translate to world position and find min/max
-        const worldCorners = rotatedCorners.map(corner => ({
+        // Translate to world position
+        return rotatedCorners.map(corner => ({
             x: this.x + corner.x,
             y: this.y + corner.y
         }));
+    }
 
-        const minX = Math.min(...worldCorners.map(c => c.x));
-        const maxX = Math.max(...worldCorners.map(c => c.x));
-        const minY = Math.min(...worldCorners.map(c => c.y));
-        const maxY = Math.max(...worldCorners.map(c => c.y));
+    getBounds() {
+        // Fallback AABB for legacy use (e.g., parking/exit checks)
+        const corners = this.getCorners();
+        const minX = Math.min(...corners.map(c => c.x));
+        const maxX = Math.max(...corners.map(c => c.x));
+        const minY = Math.min(...corners.map(c => c.y));
+        const maxY = Math.max(...corners.map(c => c.y));
 
-        const bounds = {
+        return {
             left: minX,
             right: maxX,
             top: minY,
             bottom: maxY
         };
-
-        // Diagnostic log every second to compare old vs new (remove after verification)
-        if (Math.floor(performance.now() / 1000) % 1 === 0) {
-            const oldBounds = {
-                left: this.x - this.height / 2,
-                right: this.x + this.height / 2,
-                top: this.y - this.width / 2,
-                bottom: this.y + this.width / 2
-            };
-            // console.log(`Car getBounds() - Position: x=${this.x}, y=${this.y}, angle=${this.angle.toFixed(2)}, oldBounds: {left:${oldBounds.left},right:${oldBounds.right},top:${oldBounds.top},bottom:${oldBounds.bottom}}, newBounds:`, bounds);
-        }
-        return bounds;
     }
 
     render(ctx) {
