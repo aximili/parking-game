@@ -144,13 +144,55 @@ class Car {
     }
 
     getBounds() {
-        // Bounds based on rendered car (height and width swapped in rendering)
-        return {
-            left: this.x - this.height / 2,
-            right: this.x + this.height / 2,
-            top: this.y - this.width / 2,
-            bottom: this.y + this.width / 2
+        // Rotation-aware bounds: calculate actual AABB after rotation to match visual rendering
+        const halfLength = this.height / 2; // 25px along car length
+        const halfWidth = this.width / 2;   // 15px along car width
+
+        // Four corners relative to car center, before rotation
+        const corners = [
+            { x: -halfLength, y: -halfWidth }, // top-left relative
+            { x: halfLength, y: -halfWidth },  // top-right
+            { x: halfLength, y: halfWidth },   // bottom-right
+            { x: -halfLength, y: halfWidth }   // bottom-left
+        ];
+
+        // Rotate corners around origin
+        const cosA = Math.cos(this.angle);
+        const sinA = Math.sin(this.angle);
+        const rotatedCorners = corners.map(corner => ({
+            x: corner.x * cosA - corner.y * sinA,
+            y: corner.x * sinA + corner.y * cosA
+        }));
+
+        // Translate to world position and find min/max
+        const worldCorners = rotatedCorners.map(corner => ({
+            x: this.x + corner.x,
+            y: this.y + corner.y
+        }));
+
+        const minX = Math.min(...worldCorners.map(c => c.x));
+        const maxX = Math.max(...worldCorners.map(c => c.x));
+        const minY = Math.min(...worldCorners.map(c => c.y));
+        const maxY = Math.max(...worldCorners.map(c => c.y));
+
+        const bounds = {
+            left: minX,
+            right: maxX,
+            top: minY,
+            bottom: maxY
         };
+
+        // Diagnostic log every second to compare old vs new (remove after verification)
+        if (Math.floor(performance.now() / 1000) % 1 === 0) {
+            const oldBounds = {
+                left: this.x - this.height / 2,
+                right: this.x + this.height / 2,
+                top: this.y - this.width / 2,
+                bottom: this.y + this.width / 2
+            };
+            // console.log(`Car getBounds() - Position: x=${this.x}, y=${this.y}, angle=${this.angle.toFixed(2)}, oldBounds: {left:${oldBounds.left},right:${oldBounds.right},top:${oldBounds.top},bottom:${oldBounds.bottom}}, newBounds:`, bounds);
+        }
+        return bounds;
     }
 
     render(ctx) {
@@ -159,7 +201,11 @@ class Car {
         ctx.rotate(this.angle);
 
         // Draw car SVG image with proper scaling and positioning
-        ctx.drawImage(this.image, -this.height / 2, -this.width / 2, this.height, this.width);
+        const drawX = -this.height / 2;
+        const drawY = -this.width / 2;
+        const drawWidth = this.height;
+        const drawHeight = this.width;
+        ctx.drawImage(this.image, drawX, drawY, drawWidth, drawHeight);
 
         // Draw wheels
         ctx.fillStyle = 'black';

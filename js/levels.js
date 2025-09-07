@@ -75,8 +75,7 @@ class Level {
             bottom: 350
         };
 
-        //this.startPosition = { x: 100, y: 300 };
-        this.startPosition = { x: 50, y: 50 };
+        this.startPosition = { x: 100, y: 300 };
         this.startAngle = -Math.PI / 2;
     }
 
