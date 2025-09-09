@@ -71,11 +71,11 @@ class CarPhysics {
             const collisionResult = this.checkCollisionWithMTV(car, boundary);
             if (collisionResult.collision) {
                 this.handleCollisionResponse(car, collisionResult);
-                // Return collision result for visual effects
-                return collisionResult;
+                // Return true if collision detected
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     // Project points onto an axis (unit vector)

@@ -18,7 +18,6 @@ The primary focus is developing a fully playable browser-based car parking simul
 
 ## Next Steps
 - Test the collision fix across all levels to ensure consistent behavior
-- Fine-tune collision response parameters for optimal gameplay feel
 - Consider adding additional visual indicators for collision boundaries
 - Monitor player feedback on collision responsiveness
 - Add game features like a timer, scoring system based on efficiency (e.g., time taken, collisions avoided or collisions count), or difficulty modes

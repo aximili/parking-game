@@ -10,7 +10,7 @@
 
 <body>
     <div id="game-container">
-        <div id="ui">
+        <div id="level-container">
             <div id="level-indicator">
                 <select id="level-select">
                     <option value="1" selected>1</option>
@@ -24,7 +24,15 @@
             <div id="instructions">Use arrow keys to park the car, then exit to the road!</div>
             <button id="restart-btn">Restart Level</button>
         </div>
+        <div id="score-container">
+            <div id="timer">Time: 0s</div>
+            <div id="score">Score: 0</div>
+            <div id="collisions">Collisions: 0</div>
+        </div>
+
         <canvas id="game-canvas" width="800" height="600"></canvas>
+
+        <div id="completion-message" style="display:none;">Level Complete! Score: 0 (High: 0)</div>
         <div id="mobile-controls" class="hidden">
             <button id="up-btn" class="control-btn">↑</button>
             <div class="control-row">

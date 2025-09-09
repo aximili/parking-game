@@ -10,9 +10,17 @@ class ParkingGame {
         this.physics = new CarPhysics();
         this.controls = new GameControls();
         this.lastTime = 0;
+        this.elapsedTime = 0;
+        this.startTime = 0;
+        this.timerStarted = false;
         this.audioContext = null;
         this.lastCrashTime = 0;
         this.collisionEffect = null; // For visual collision feedback
+        this.collisionsCount = 0;
+        this.lastCollision = false;
+        this.currentScore = 0;
+        this.highScore = 0;
+        this.showScore = true;
 
         // Screen shake effect for collisions
         this.shakeIntensity = 0;
@@ -29,9 +37,18 @@ class ParkingGame {
     }
 
     loadLevel(levelNumber) {
+        this.currentLevel = levelNumber;
         this.level = new Level(levelNumber);
         this.car = new Car(this.level.startPosition.x, this.level.startPosition.y, this.level.startAngle);
+        const highScores = JSON.parse(localStorage.getItem('highScores') || '{}');
+        this.highScore = highScores[levelNumber] || 0;
         this.gameState = 'playing';
+        this.startTime = 0;
+        this.elapsedTime = 0;
+        this.timerStarted = false;
+        this.collisionsCount = 0;
+        this.lastCollision = false;
+        this.currentScore = 0;
         document.getElementById('level-select').value = levelNumber;
     }
 
@@ -58,16 +75,38 @@ class ParkingGame {
     }
 
     update(deltaTime) {
+        if (this.gameState === 'playing') {
+            // Start timer on first input
+            if (!this.timerStarted) {
+                if (this.controls.up > 0 || this.controls.down > 0 || this.controls.left > 0 || this.controls.right > 0) {
+                    this.timerStarted = true;
+                    this.startTime = Date.now();
+                }
+            }
+        }
+
+        if (this.gameState === 'playing' || this.gameState === 'exiting') {
+            if (this.timerStarted) {
+                this.elapsedTime += deltaTime;
+            }
+
+            const base = 1000;
+            const timePenalty = 250 * (1 - Math.exp(-this.elapsedTime / 20));
+            const collisionsPenalty = this.collisionsCount * 50;
+            this.currentScore = Math.max(0, base - timePenalty - collisionsPenalty);
+        }
+
         if (this.gameState === 'playing' || this.gameState === 'exiting') {
             this.controls.update();
-            const impactSpeed = Math.abs(this.car.velocity);
-            const collisionResult = this.physics.update(this.car, this.controls, deltaTime, this.level.boundaries);
-            if (collisionResult) {
-                // Trigger visual collision effect with impact speed
+            const isColliding = this.physics.update(this.car, this.controls, deltaTime, this.level.boundaries);
+            if (isColliding && !this.lastCollision) {
+                this.collisionsCount++;
+                const impactSpeed = Math.abs(this.car.velocity);
                 this.triggerCollisionEffect(this.car, impactSpeed);
                 this.playCrashSound();
                 this.addScreenShake(impactSpeed);
             }
+            this.lastCollision = isColliding;
             this.checkParkingSuccess();
             this.checkExitSuccess();
         }
@@ -119,6 +158,21 @@ class ParkingGame {
             if (positionCheck) {
                 this.playExitSound();
                 this.gameState = 'completed';
+                const highScores = JSON.parse(localStorage.getItem('highScores') || '{}');
+                highScores[this.currentLevel] = Math.max(highScores[this.currentLevel] || 0, Math.floor(this.currentScore));
+                localStorage.setItem('highScores', JSON.stringify(highScores));
+                this.highScore = highScores[this.currentLevel];
+                const completionMsg = document.getElementById('completion-message');
+                if (completionMsg) {
+                    completionMsg.textContent = `Level Complete! Score: ${Math.floor(this.currentScore)} (High: ${this.highScore})`;
+                    completionMsg.style.display = 'block';
+                }
+                setTimeout(() => {
+                    const completionMsg = document.getElementById('completion-message');
+                    if (completionMsg) {
+                        completionMsg.style.display = 'none';
+                    }
+                }, 10000);
                 this.nextLevel();
             }
         }
@@ -341,6 +395,22 @@ class ParkingGame {
             this.ctx.textAlign = 'center';
             this.ctx.fillText('LEVEL COMPLETE!', this.canvas.width / 2, this.canvas.height / 2);
             this.ctx.textAlign = 'left';
+        }
+
+        // Update timer display
+        const timerEl = document.getElementById('timer');
+        if (timerEl) {
+            timerEl.textContent = `Time: ${this.elapsedTime.toFixed(1)}s`;
+        }
+
+        const scoreEl = document.getElementById('score');
+        if (scoreEl && this.showScore) {
+            scoreEl.textContent = `Score: ${Math.floor(this.currentScore)}`;
+        }
+
+        const collisionsEl = document.getElementById('collisions');
+        if (collisionsEl) {
+            collisionsEl.textContent = `Collisions: ${this.collisionsCount}`;
         }
     }
 
