@@ -91,7 +91,7 @@ class ParkingGame {
             }
 
             const base = 1000;
-            const timePenalty = 250 * (1 - Math.exp(-this.elapsedTime / 20));
+            const timePenalty = 1000 * (1 - Math.exp(-this.elapsedTime / 100));
             const collisionsPenalty = this.collisionsCount * 50;
             this.currentScore = Math.max(0, base - timePenalty - collisionsPenalty);
         }
@@ -179,7 +179,7 @@ class ParkingGame {
     }
 
     playSuccessSound() {
-        // Simple beep sound using Web Audio API
+        // Enhanced celebratory rising chime using multiple oscillators
         if (!this.audioContext) {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
@@ -187,24 +187,47 @@ class ParkingGame {
             this.audioContext.resume();
         }
 
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
+        const now = this.audioContext.currentTime;
 
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        // First note: 600Hz
+        const osc1 = this.audioContext.createOscillator();
+        const gain1 = this.audioContext.createGain();
+        osc1.type = 'sine';
+        osc1.connect(gain1);
+        gain1.connect(this.audioContext.destination);
+        osc1.frequency.value = 600;
+        gain1.gain.setValueAtTime(0.3, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc1.start(now);
+        osc1.stop(now + 0.1);
 
-        oscillator.frequency.setValueAtTime(600, this.audioContext.currentTime);
-        oscillator.frequency.setValueAtTime(400, this.audioContext.currentTime + 0.1);
+        // Second note: 800Hz
+        const osc2 = this.audioContext.createOscillator();
+        const gain2 = this.audioContext.createGain();
+        osc2.type = 'sine';
+        osc2.connect(gain2);
+        gain2.connect(this.audioContext.destination);
+        osc2.frequency.value = 800;
+        gain2.gain.setValueAtTime(0.3, now + 0.1);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc2.start(now + 0.1);
+        osc2.stop(now + 0.2);
 
-        gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
-
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 0.3);
+        // Third note: 1000Hz
+        const osc3 = this.audioContext.createOscillator();
+        const gain3 = this.audioContext.createGain();
+        osc3.type = 'sine';
+        osc3.connect(gain3);
+        gain3.connect(this.audioContext.destination);
+        osc3.frequency.value = 1000;
+        gain3.gain.setValueAtTime(0.3, now + 0.2);
+        gain3.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc3.start(now + 0.2);
+        osc3.stop(now + 0.3);
     }
 
     playExitSound() {
-        // Simple beep sound using Web Audio API
+        // Enhanced triumphant ascending tone with dual oscillators for whoosh effect
         if (!this.audioContext) {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
@@ -212,20 +235,33 @@ class ParkingGame {
             this.audioContext.resume();
         }
 
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
+        const now = this.audioContext.currentTime;
 
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        // Main ascending sine wave
+        const mainOsc = this.audioContext.createOscillator();
+        const mainGain = this.audioContext.createGain();
+        mainOsc.type = 'sine';
+        mainOsc.connect(mainGain);
+        mainGain.connect(this.audioContext.destination);
+        mainOsc.frequency.setValueAtTime(800, now);
+        mainOsc.frequency.linearRampToValueAtTime(1200, now + 0.4);
+        mainGain.gain.setValueAtTime(0.3, now);
+        mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        mainOsc.start(now);
+        mainOsc.stop(now + 0.4);
 
-        oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
-        oscillator.frequency.setValueAtTime(600, this.audioContext.currentTime + 0.1);
-
-        gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
-
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 0.3);
+        // Harmonic square wave for richness
+        const harmOsc = this.audioContext.createOscillator();
+        const harmGain = this.audioContext.createGain();
+        harmOsc.type = 'square';
+        harmOsc.connect(harmGain);
+        harmGain.connect(this.audioContext.destination);
+        harmOsc.frequency.setValueAtTime(400, now);
+        harmOsc.frequency.linearRampToValueAtTime(600, now + 0.4);
+        harmGain.gain.setValueAtTime(0.15, now);
+        harmGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        harmOsc.start(now);
+        harmOsc.stop(now + 0.4);
     }
 
     playCrashSound() {
@@ -234,7 +270,7 @@ class ParkingGame {
         if (currentTime - this.lastCrashTime < 0.5) return;
         this.lastCrashTime = currentTime;
 
-        // Crash sound using Web Audio API - lower frequency for impact
+        // Enhanced crash sound with dual-oscillator rumble for impact
         if (!this.audioContext) {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
@@ -242,20 +278,34 @@ class ParkingGame {
             this.audioContext.resume();
         }
 
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
+        // Main crash oscillator (sawtooth for harshness)
+        const mainOsc = this.audioContext.createOscillator();
+        const mainGain = this.audioContext.createGain();
+        mainOsc.type = 'sawtooth';
+        mainOsc.connect(mainGain);
+        mainGain.connect(this.audioContext.destination);
 
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        mainOsc.frequency.setValueAtTime(50, this.audioContext.currentTime);
+        mainOsc.frequency.setValueAtTime(25, this.audioContext.currentTime + 0.1);
+        mainGain.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+        mainGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
 
-        oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
-        oscillator.frequency.setValueAtTime(150, this.audioContext.currentTime + 0.1);
+        // Low-frequency rumble oscillator (sine for bass)
+        const rumbleOsc = this.audioContext.createOscillator();
+        const rumbleGain = this.audioContext.createGain();
+        rumbleOsc.type = 'sine';
+        rumbleOsc.connect(rumbleGain);
+        rumbleGain.connect(this.audioContext.destination);
 
-        gainNode.gain.setValueAtTime(0.5, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.4);
+        rumbleOsc.frequency.setValueAtTime(10, this.audioContext.currentTime);
+        rumbleOsc.frequency.setValueAtTime(5, this.audioContext.currentTime + 0.2);
+        rumbleGain.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+        rumbleGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
 
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 0.4);
+        mainOsc.start(this.audioContext.currentTime);
+        mainOsc.stop(this.audioContext.currentTime + 0.5);
+        rumbleOsc.start(this.audioContext.currentTime);
+        rumbleOsc.stop(this.audioContext.currentTime + 0.5);
     }
 
     // Trigger collision visual effect
