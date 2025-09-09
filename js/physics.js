@@ -230,7 +230,7 @@ class CarPhysics {
         //     console.log(`Bounce strength: ${bounceStrength.toFixed(2)}`);
         //     // car.velocity -= velocityAlongNormal * bounceStrength;
         // }
-        car.velocity = car.velocity * -0.3;
+        car.velocity = car.velocity * (car.velocity > 0 ? -0.3 : -0.6); // bounce back
 
         // Then apply velocity reduction
         // car.velocity *= (1 - damageFactor * 0.8); // Stronger velocity reduction
