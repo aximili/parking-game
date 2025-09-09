@@ -27,6 +27,10 @@ class ParkingGame {
         this.shakeIntensity = 0;
         this.shakeDuration = 0;
 
+        // Mobile scaling
+        this.isMobile = false;
+        this.scale = 1;
+
         this.init();
         this.gameLoop();
     }
@@ -35,6 +39,34 @@ class ParkingGame {
         this.loadLevel(this.currentLevel);
         this.setupEventListeners();
         this.detectDevice();
+        this.applyScaling();
+        // Add resize listener for dynamic scaling and re-apply ctx scale if needed
+        window.addEventListener('resize', () => {
+            this.applyScaling();
+            if (this.scale < 1) {
+                this.ctx.scale(this.scale, this.scale);
+            } else {
+                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+            }
+        });
+    }
+
+    applyScaling() {
+        const originalHeight = 600;
+        this.scale = 1;
+        if (window.innerHeight < originalHeight) {
+            this.scale = Math.min(1, (window.innerHeight * 0.95) / originalHeight);
+            // if (this.scale < 1) {
+            //     const scaledWidth = 800 * this.scale;
+            //     const scaledHeight = originalHeight * this.scale;
+            //     this.canvas.style.width = `${scaledWidth}px`;
+            //     this.canvas.style.height = `${scaledHeight}px`;
+            //     return;
+            // }
+        }
+        // Full size
+        this.canvas.style.width = '800px';
+        this.canvas.style.height = '600px';
     }
 
     loadLevel(levelNumber) {
@@ -73,8 +105,10 @@ class ParkingGame {
     detectDevice() {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
             ('ontouchstart' in window);
+        this.isMobile = isMobile;
         if (isMobile) {
-            document.getElementById('mobile-controls').classList.remove('hidden');
+            document.getElementById('mobile-controls-left').classList.remove('hidden');
+            document.getElementById('mobile-controls-right').classList.remove('hidden');
         }
     }
 
@@ -88,7 +122,7 @@ class ParkingGame {
                 this.readyDelayStart = Date.now();
             }
             const delayElapsed = Date.now() - this.readyDelayStart;
-            if (delayElapsed >= 3000) {
+            if (delayElapsed >= 2000) {
                 // After delay, wait for first input to start playing
                 if (!this.firstInputDetected && (this.controls.up > 0 || this.controls.down > 0 || this.controls.left > 0 || this.controls.right > 0)) {
                     this.firstInputDetected = true;
@@ -264,8 +298,8 @@ class ParkingGame {
         mainOsc.type = 'sine';
         mainOsc.connect(mainGain);
         mainGain.connect(this.audioContext.destination);
-        mainOsc.frequency.setValueAtTime(800, now);
-        mainOsc.frequency.linearRampToValueAtTime(1200, now + 0.4);
+        mainOsc.frequency.setValueAtTime(1400, now);
+        mainOsc.frequency.linearRampToValueAtTime(4500, now + 0.4);
         mainGain.gain.setValueAtTime(0.3, now);
         mainGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
         mainOsc.start(now);
@@ -277,8 +311,8 @@ class ParkingGame {
         harmOsc.type = 'square';
         harmOsc.connect(harmGain);
         harmGain.connect(this.audioContext.destination);
-        harmOsc.frequency.setValueAtTime(400, now);
-        harmOsc.frequency.linearRampToValueAtTime(600, now + 0.4);
+        harmOsc.frequency.setValueAtTime(700, now);
+        harmOsc.frequency.linearRampToValueAtTime(2250, now + 0.4);
         harmGain.gain.setValueAtTime(0.15, now);
         harmGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
         harmOsc.start(now);
