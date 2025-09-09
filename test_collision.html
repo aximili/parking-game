@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collision Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            display: block;
+            margin: 20px 0;
+        }
+
+        .controls {
+            margin: 10px 0;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px;
+        }
+
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Collision System Test</h1>
+    <div class="controls">
+        <button onclick="testCollision()">Test Collision Response</button>
+        <button onclick="testHighSpeedCollision()">Test High-Speed Collision</button>
+        <button onclick="resetCar()">Reset Car</button>
+    </div>
+    <div class="status" id="status">Ready to test collision system...</div>
+    <canvas id="testCanvas" width="800" height="600"></canvas>
+
+    <script src="js/physics.js"></script>
+    <script>
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+        const status = document.getElementById('status');
+
+        // Create test car and physics
+        const car = new Car(100, 300, 0);
+        const physics = new CarPhysics();
+        const controls = { up: false, down: false, left: false, right: false };
+
+        // Test boundary
+        const boundary = { left: 300, right: 500, top: 200, bottom: 400 };
+
+        function updateStatus(message) {
+            status.innerHTML = message;
+        }
+
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw boundary
+            ctx.fillStyle = '#666';
+            ctx.fillRect(boundary.left, boundary.top,
+                boundary.right - boundary.left,
+                boundary.bottom - boundary.top);
+
+            // Draw car
+            car.render(ctx);
+
+            // Draw collision info
+            ctx.fillStyle = '#000';
+            ctx.font = '14px Arial';
+            ctx.fillText(`Velocity: ${car.velocity.toFixed(1)}`, 10, 20);
+            ctx.fillText(`Position: (${car.x.toFixed(0)}, ${car.y.toFixed(0)})`, 10, 40);
+            ctx.fillText(`Steering: ${car.steeringAngle.toFixed(2)}`, 10, 60);
+        }
+
+        function testCollision() {
+            updateStatus('Testing low-speed collision...');
+            car.x = 250;
+            car.y = 300;
+            car.velocity = 50; // Medium speed
+            car.angle = 0;
+            car.steeringAngle = 0;
+
+            // Simulate collision
+            const result = physics.update(car, controls, 1 / 60, [boundary]);
+
+            if (result) {
+                updateStatus(`Collision detected! MTV: (${result.mtv.x.toFixed(1)}, ${result.mtv.y.toFixed(1)})<br>
+                             New velocity: ${car.velocity.toFixed(1)}<br>
+                             Position: (${car.x.toFixed(0)}, ${car.y.toFixed(0)})`);
+            } else {
+                updateStatus('No collision detected');
+            }
+
+            drawScene();
+        }
+
+        function testHighSpeedCollision() {
+            updateStatus('Testing high-speed collision...');
+            car.x = 250;
+            car.y = 300;
+            car.velocity = 100; // High speed
+            car.angle = 0;
+            car.steeringAngle = 0;
+
+            // Simulate collision
+            const result = physics.update(car, controls, 1 / 60, [boundary]);
+
+            if (result) {
+                updateStatus(`High-speed collision detected! MTV: (${result.mtv.x.toFixed(1)}, ${result.mtv.y.toFixed(1)})<br>
+                             New velocity: ${car.velocity.toFixed(1)}<br>
+                             Position: (${car.x.toFixed(0)}, ${car.y.toFixed(0)})<br>
+                             Steering disrupted: ${car.steeringAngle.toFixed(2)}`);
+            } else {
+                updateStatus('No collision detected');
+            }
+
+            drawScene();
+        }
+
+        function resetCar() {
+            car.x = 100;
+            car.y = 300;
+            car.velocity = 0;
+            car.angle = 0;
+            car.steeringAngle = 0;
+            updateStatus('Car reset to initial position');
+            drawScene();
+        }
+
+        // Initial draw
+        drawScene();
+    </script>
+</body>
+
+</html>

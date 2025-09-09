@@ -66,12 +66,16 @@ class CarPhysics {
         car.x += moveX;
         car.y += moveY;
 
-        // Check collision with boundaries
+        // Check collision with boundaries and handle response
         for (const boundary of boundaries) {
-            if (this.checkCollision(car, boundary)) {
-                car.velocity = 0;
+            const collisionResult = this.checkCollisionWithMTV(car, boundary);
+            if (collisionResult.collision) {
+                this.handleCollisionResponse(car, collisionResult);
+                // Return collision result for visual effects
+                return collisionResult;
             }
         }
+        return null;
     }
 
     // Project points onto an axis (unit vector)
@@ -150,10 +154,15 @@ class CarPhysics {
         }
 
         // Determine MTV direction (towards car center from AABB)
-        const carCenter = { x: (boundary.left + boundary.right) / 2, y: (boundary.top + boundary.bottom) / 2 }; // Wait, no: car center
-        const carCenterWorld = { x: this.x, y: this.y }; // Car's center
         const aabbCenter = { x: (boundary.left + boundary.right) / 2, y: (boundary.top + boundary.bottom) / 2 };
-        const toCar = { x: carCenterWorld.x - aabbCenter.x, y: carCenterWorld.y - aabbCenter.y };
+
+        // Calculate car center from the corners (more reliable than using this.x, this.y)
+        const carCenter = {
+            x: (carCorners[0].x + carCorners[2].x) / 2,
+            y: (carCorners[0].y + carCorners[2].y) / 2
+        };
+
+        const toCar = { x: carCenter.x - aabbCenter.x, y: carCenter.y - aabbCenter.y };
         const dot = toCar.x * minAxis.x + toCar.y * minAxis.y;
         const mtv = { x: minAxis.x * minOverlap * (dot > 0 ? 1 : -1), y: minAxis.y * minOverlap * (dot > 0 ? 1 : -1) };
 
@@ -161,9 +170,6 @@ class CarPhysics {
     }
 
     checkCollision(car, boundary) {
-        console.log('About to call getCorners on car:', car);
-        console.log('Car instanceof Car:', car instanceof Car);
-        console.log('getCorners type:', typeof car.getCorners);
         const carCorners = car.getCorners();
         const aabbCorners = [
             { x: boundary.left, y: boundary.top },
@@ -195,6 +201,66 @@ class CarPhysics {
     }
     */
 
+    // Check collision between car and boundary with MTV
+    checkCollisionWithMTV(car, boundary) {
+        const carCorners = car.getCorners();
+        return this.checkSATCollision(carCorners, boundary);
+    }
+
+    // Handle collision response with momentum preservation and damage
+    handleCollisionResponse(car, collisionResult) {
+        const { mtv } = collisionResult;
+
+        // Apply MTV to separate car from boundary
+        car.x += mtv.x;
+        car.y += mtv.y;
+
+        // Calculate collision damage/slowdown based on impact velocity
+        const impactSpeed = Math.abs(car.velocity);
+        // console.log(`Collision at speed: ${impactSpeed.toFixed(1)}`);
+        const damageFactor = Math.min(impactSpeed / 40, 1.2); // More sensitive damage calculation
+
+        // Calculate bounce-back effect once
+        const mtvLength = Math.sqrt(mtv.x * mtv.x + mtv.y * mtv.y);
+        // if (mtvLength > 0) {
+        //     const normalX = mtv.x / mtvLength;
+        //     const normalY = mtv.y / mtvLength;
+        //     const velocityAlongNormal = car.velocity * (Math.cos(car.angle) * normalX + Math.sin(car.angle) * normalY);
+        //     const bounceStrength = Math.min(impactSpeed / 3, 2.0); // Stronger 200% bounce
+        //     console.log(`Bounce strength: ${bounceStrength.toFixed(2)}`);
+        //     // car.velocity -= velocityAlongNormal * bounceStrength;
+        // }
+        car.velocity = car.velocity * -0.3;
+
+        // Then apply velocity reduction
+        // car.velocity *= (1 - damageFactor * 0.8); // Stronger velocity reduction
+        // console.log(`Post-collision velocity: ${car.velocity.toFixed(1)}`);
+        // Reuse existing mtvLength variable
+        // if (mtvLength > 0) {
+        //     const normalX = mtv.x / mtvLength;
+        //     const normalY = mtv.y / mtvLength;
+
+        //     // Calculate velocity component along collision normal
+        //     const velocityAlongNormal = car.velocity * (Math.cos(car.angle) * normalX + Math.sin(car.angle) * normalY);
+
+        //     // Apply bounce-back (reverse velocity along normal) - more aggressive for better feel
+        //     // Test settings - maximum bounce
+        //     const bounceStrength = Math.min(impactSpeed / 2, 0.8); // Up to 80% bounce back
+        //     console.log(`BOUNCE: ${bounceStrength.toFixed(2)} from impact ${impactSpeed.toFixed(1)}`);
+        //     car.velocity -= velocityAlongNormal * bounceStrength;
+        // }
+
+        // // Reduce velocity based on damage, but preserve some momentum
+        // const remainingVelocity = car.velocity * (1 - damageFactor * 0.6); // Keep 40% of velocity at max damage
+        // car.velocity = remainingVelocity * 0.5; // Moderate additional reduction
+
+        // // Add steering disruption for realistic effect
+        // if (damageFactor > 0.3) {
+        //     car.steeringAngle *= (1 - damageFactor * 0.2); // Reduce steering angle based on damage
+        // }
+    }
+
+    // Legacy collision handler (kept for compatibility)
     handleCollision(car, boundary) {
         car.velocity = 0;
     }

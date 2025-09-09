@@ -37,4 +37,7 @@
 - **Extension Points:** Add new levels by extending `Level` class switch cases; new features via composition in `ParkingGame` (e.g., add Timer class).
 - **Script Loading Dependency Order:** Scripts loaded in specific order via <script> tags in index.html: game.js first (core orchestrator), then physics.js (depends on game), controls.js, levels.js to ensure dependencies resolve without timing issues.
 
+## Development Workflow Notes
+- **User Testing:** User already has the game open in browser and just needs to refresh to see changes. Do not run the game for them.
+
 This setup ensures the game is quick to develop, test, and deploy while maintaining high performance and broad compatibility.

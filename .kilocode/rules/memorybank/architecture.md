@@ -17,7 +17,7 @@ The project structure is flat: root contains index.html, css/ and js/ directorie
 ## Key Technical Decisions
 - **Modular JS Loading:** Scripts loaded via <script> tags in specific order to ensure dependencies (e.g., game.js first, then physics.js, etc.); fixed loading order in index.html to prevent timing issues.
 - **Canvas Rendering:** 2D context for efficient drawing with transformations (translate, rotate) for car orientation.
-- **Physics Model:** Bicycle model for steering (turn radius based on wheelbase and steering angle); SAT (Separating Axis Theorem) collision detection for rotated car vs axis-aligned obstacles, with projection and axes overlap checks; simplified response to velocity=0 on collision without MTV-based pushAway to prevent unnatural warping.
+- **Physics Model:** Car is 30x50px rectangle that can rotate. Bicycle model for steering (turn radius based on wheelbase and steering angle); SAT (Separating Axis Theorem) collision detection for rotated car vs axis-aligned obstacles, with projection and axes overlap checks; simplified response to velocity=0 on collision without MTV-based pushAway to prevent unnatural warping. Obstacles/walls are always rectangles.
 - **Input Smoothing:** Gradual ramping of control states (0-1) for responsive yet precise handling.
 - **State Management:** Simple finite state machine (FSM) with string states ('playing', 'parked', etc.) to control progression and UI updates.
 - **Asset Fallbacks:** SVG images with canvas-drawn alternatives (rects, strokes) if loading fails.

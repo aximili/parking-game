@@ -12,6 +12,11 @@ class ParkingGame {
         this.lastTime = 0;
         this.audioContext = null;
         this.lastCrashTime = 0;
+        this.collisionEffect = null; // For visual collision feedback
+
+        // Screen shake effect for collisions
+        this.shakeIntensity = 0;
+        this.shakeDuration = 0;
 
         this.init();
         this.gameLoop();
@@ -55,24 +60,22 @@ class ParkingGame {
     update(deltaTime) {
         if (this.gameState === 'playing' || this.gameState === 'exiting') {
             this.controls.update();
-            this.physics.update(this.car, this.controls, deltaTime, this.level.boundaries);
-            this.checkCollisions();
+            const impactSpeed = Math.abs(this.car.velocity);
+            const collisionResult = this.physics.update(this.car, this.controls, deltaTime, this.level.boundaries);
+            if (collisionResult) {
+                // Trigger visual collision effect with impact speed
+                this.triggerCollisionEffect(this.car, impactSpeed);
+                this.playCrashSound();
+                this.addScreenShake(impactSpeed);
+            }
             this.checkParkingSuccess();
             this.checkExitSuccess();
         }
+
+        // Update screen shake effect
+        this.updateScreenShake(deltaTime);
     }
 
-    checkCollisions() {
-        // Check collision with boundaries
-        const carBounds = this.car.getBounds();
-        for (const boundary of this.level.boundaries) {
-            if (this.physics.checkCollision(this.car, boundary)) {
-                this.physics.handleCollision(this.car, boundary);
-                this.playCrashSound();
-                break; // Play sound once per collision check
-            }
-        }
-    }
 
     checkParkingSuccess() {
         if (this.gameState === 'playing') {
@@ -201,6 +204,76 @@ class ParkingGame {
         oscillator.stop(this.audioContext.currentTime + 0.4);
     }
 
+    // Trigger collision visual effect
+    triggerCollisionEffect(car, impactSpeed) {
+        this.collisionEffect = {
+            x: car.x,
+            y: car.y,
+            intensity: Math.min(impactSpeed / 10, 1.0),
+            duration: 500, // milliseconds
+            startTime: Date.now()
+        };
+    }
+
+    // Draw collision visual effect
+    drawCollisionEffect() {
+        if (!this.collisionEffect) return;
+
+        const now = Date.now();
+        const elapsed = now - this.collisionEffect.startTime;
+
+        if (elapsed > this.collisionEffect.duration) {
+            this.collisionEffect = null;
+            return;
+        }
+
+        const progress = elapsed / this.collisionEffect.duration;
+        const alpha = (1 - progress) * this.collisionEffect.intensity;
+        const radius = progress * 30 * this.collisionEffect.intensity;
+
+        this.ctx.save();
+        this.ctx.globalAlpha = alpha;
+        this.ctx.strokeStyle = '#ff4444';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.arc(this.collisionEffect.x, this.collisionEffect.y, radius, 0, Math.PI * 2);
+        this.ctx.stroke();
+
+        // Add some particles for extra effect
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const particleRadius = radius * 0.8;
+            const x = this.collisionEffect.x + Math.cos(angle) * particleRadius;
+            const y = this.collisionEffect.y + Math.sin(angle) * particleRadius;
+
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 2, 0, Math.PI * 2);
+            this.ctx.fillStyle = '#ffaa44';
+            this.ctx.fill();
+        }
+
+        this.ctx.restore();
+    }
+
+    addScreenShake(impactSpeed) {
+        // Add screen shake based on collision intensity
+        const shakeAmount = Math.min(impactSpeed / 2, 10);
+        this.shakeIntensity = Math.max(this.shakeIntensity, shakeAmount);
+        this.shakeDuration = Math.max(this.shakeDuration, 0.5); // 500ms duration
+        // console.log(`Screen shake: ${shakeAmount.toFixed(1)}px for ${this.shakeDuration.toFixed(1)}s`);
+    }
+
+    updateScreenShake(deltaTime) {
+        // Update screen shake effect
+        if (this.shakeDuration > 0) {
+            this.shakeDuration -= deltaTime;
+            this.shakeIntensity *= 0.85; // Decay shake intensity
+            if (this.shakeDuration <= 0) {
+                this.shakeIntensity = 0;
+            }
+        }
+    }
+
     showSuccessEffect() {
         // Simple visual effect
         this.ctx.save();
@@ -222,6 +295,13 @@ class ParkingGame {
     }
 
     render() {
+        // Apply screen shake effect
+        const shakeX = (Math.random() - 0.5) * this.shakeIntensity;
+        const shakeY = (Math.random() - 0.5) * this.shakeIntensity;
+
+        this.ctx.save();
+        this.ctx.translate(shakeX, shakeY);
+
         // Clear canvas with background
         this.ctx.fillStyle = '#2C2C2C';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -232,7 +312,12 @@ class ParkingGame {
         // Draw car
         this.car.render(this.ctx);
 
-        // Draw UI overlays
+        // Draw collision visual effect
+        this.drawCollisionEffect();
+
+        this.ctx.restore();
+
+        // Draw UI overlays (not affected by shake)
         if (this.gameState === 'parked') {
             // Semi-transparent overlay
             this.ctx.fillStyle = 'rgba(0, 100, 0, 0.7)';

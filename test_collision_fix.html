@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collision Detection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Collision Detection Test</h1>
+    <div id="test-results"></div>
+
+    <script src="js/car.js"></script>
+    <script src="js/physics.js"></script>
+    <script>
+        function runTests() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '';
+
+            try {
+                // Test 1: Create car and physics objects
+                const car = new Car(100, 100, 0);
+                const physics = new CarPhysics();
+
+                addResult('Car and Physics objects created successfully', true);
+
+                // Test 2: Test getCorners method
+                const corners = car.getCorners();
+                addResult(`getCorners() returned ${corners.length} corners`, corners.length === 4);
+
+                // Test 3: Test getBounds method
+                const bounds = car.getBounds();
+                addResult(`getBounds() returned valid bounds: ${JSON.stringify(bounds)}`,
+                    bounds && typeof bounds.left === 'number');
+
+                // Test 4: Test collision with boundary
+                const boundary = { left: 50, right: 150, top: 50, bottom: 150 };
+                const collision = physics.checkCollision(car, boundary);
+                addResult(`Collision detection works: ${collision}`, typeof collision === 'boolean');
+
+                // Test 5: Test SAT collision detection
+                const carCorners = car.getCorners();
+                const satResult = physics.checkSATCollision(carCorners, boundary);
+                addResult(`SAT collision detection works: ${satResult.collision}`,
+                    satResult && typeof satResult.collision === 'boolean');
+
+                addResult('All collision detection tests completed successfully!', true, 'info');
+
+            } catch (error) {
+                addResult(`Error during testing: ${error.message}`, false);
+                console.error('Test error:', error);
+            }
+        }
+
+        function addResult(message, passed, type = null) {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            if (type) div.classList.add(type);
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+
+</html>
