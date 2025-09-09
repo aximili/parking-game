@@ -93,8 +93,8 @@ class Level {
 
         this.parkingSpot = {
             left: 300,
-            right: 350,
-            top: 200,
+            right: 345,
+            top: 210,
             bottom: 300,
             angle: -Math.PI / 2 // Face up
         };

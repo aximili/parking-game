@@ -15,6 +15,7 @@ class ParkingGame {
         this.timerStarted = false;
         this.audioContext = null;
         this.lastCrashTime = 0;
+        this.lastCollisionTime = 0;
         this.collisionEffect = null; // For visual collision feedback
         this.collisionsCount = 0;
         this.lastCollision = false;
@@ -48,6 +49,7 @@ class ParkingGame {
         this.timerStarted = false;
         this.collisionsCount = 0;
         this.lastCollision = false;
+        this.lastCollisionTime = 0;
         this.currentScore = 0;
         document.getElementById('level-select').value = levelNumber;
     }
@@ -99,8 +101,9 @@ class ParkingGame {
         if (this.gameState === 'playing' || this.gameState === 'exiting') {
             this.controls.update();
             const isColliding = this.physics.update(this.car, this.controls, deltaTime, this.level.boundaries);
-            if (isColliding && !this.lastCollision) {
+            if (isColliding && !this.lastCollision && (Date.now() - this.lastCollisionTime > 1000)) { // at most once per second
                 this.collisionsCount++;
+                this.lastCollisionTime = Date.now();
                 const impactSpeed = Math.abs(this.car.velocity);
                 this.triggerCollisionEffect(this.car, impactSpeed);
                 this.playCrashSound();
@@ -119,16 +122,18 @@ class ParkingGame {
     checkParkingSuccess() {
         if (this.gameState === 'playing') {
             const parkingSpot = this.level.parkingSpot;
-            const carBounds = this.car.getBounds();
+            const carCorners = this.car.getCorners();
 
-            // More lenient position check (allow 5 pixel tolerance)
-            const positionCheck = carBounds.left >= parkingSpot.left - 5 &&
-                carBounds.right <= parkingSpot.right + 5 &&
-                carBounds.top >= parkingSpot.top - 5 &&
-                carBounds.bottom <= parkingSpot.bottom + 5;
+            // Strict position check: all car corners must be 100% within parking spot bounds
+            const positionCheck = carCorners.every(corner =>
+                corner.x >= parkingSpot.left &&
+                corner.x <= parkingSpot.right &&
+                corner.y >= parkingSpot.top &&
+                corner.y <= parkingSpot.bottom
+            );
 
-            // Check if car is mostly stopped (speed < 10)
-            const speedCheck = Math.abs(this.car.velocity) < 10;
+            // Check if car is nearly stopped (low speed)
+            const speedCheck = Math.abs(this.car.velocity) < 0.1;
 
             // Only require position and low speed - no angle requirement (like real parking)
             if (positionCheck && speedCheck) {
@@ -147,13 +152,15 @@ class ParkingGame {
     checkExitSuccess() {
         if (this.gameState === 'exiting') {
             const exitArea = this.level.exitArea;
-            const carBounds = this.car.getBounds();
+            const carCorners = this.car.getCorners();
 
-            // More lenient position check for exit (allow 5 pixel tolerance)
-            const positionCheck = carBounds.left >= exitArea.left - 5 &&
-                carBounds.right <= exitArea.right + 5 &&
-                carBounds.top >= exitArea.top - 5 &&
-                carBounds.bottom <= exitArea.bottom + 5;
+            // Strict position check: all car corners must be 100% within exit area bounds
+            const positionCheck = carCorners.every(corner =>
+                corner.x >= exitArea.left &&
+                corner.x <= exitArea.right &&
+                corner.y >= exitArea.top &&
+                corner.y <= exitArea.bottom
+            );
 
             if (positionCheck) {
                 this.playExitSound();
