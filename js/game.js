@@ -43,10 +43,12 @@ class ParkingGame {
         this.car = new Car(this.level.startPosition.x, this.level.startPosition.y, this.level.startAngle);
         const highScores = JSON.parse(localStorage.getItem('highScores') || '{}');
         this.highScore = highScores[levelNumber] || 0;
-        this.gameState = 'playing';
+        this.gameState = 'ready';
         this.startTime = 0;
         this.elapsedTime = 0;
         this.timerStarted = false;
+        this.readyDelayStart = 0;
+        this.firstInputDetected = false;
         this.collisionsCount = 0;
         this.lastCollision = false;
         this.lastCollisionTime = 0;
@@ -77,14 +79,27 @@ class ParkingGame {
     }
 
     update(deltaTime) {
-        if (this.gameState === 'playing') {
-            // Start timer on first input
-            if (!this.timerStarted) {
-                if (this.controls.up > 0 || this.controls.down > 0 || this.controls.left > 0 || this.controls.right > 0) {
+        // Always update controls to detect input even in ready state
+        this.controls.update();
+
+        if (this.gameState === 'ready') {
+            // 2-second delay after level load
+            if (this.readyDelayStart === 0) {
+                this.readyDelayStart = Date.now();
+            }
+            const delayElapsed = Date.now() - this.readyDelayStart;
+            if (delayElapsed >= 3000) {
+                // After delay, wait for first input to start playing
+                if (!this.firstInputDetected && (this.controls.up > 0 || this.controls.down > 0 || this.controls.left > 0 || this.controls.right > 0)) {
+                    this.firstInputDetected = true;
+                    this.gameState = 'playing';
                     this.timerStarted = true;
                     this.startTime = Date.now();
                 }
             }
+            // Don't update physics or timer during ready state
+            this.updateScreenShake(deltaTime);
+            return;
         }
 
         if (this.gameState === 'playing' || this.gameState === 'exiting') {
@@ -93,13 +108,12 @@ class ParkingGame {
             }
 
             const base = 1000;
-            const timePenalty = 1000 * (1 - Math.exp(-this.elapsedTime / 100));
-            const collisionsPenalty = this.collisionsCount * 50;
+            const timePenalty = 600 * (1 - Math.exp(-this.elapsedTime / 400));
+            const collisionsPenalty = this.collisionsCount * 20;
             this.currentScore = Math.max(0, base - timePenalty - collisionsPenalty);
         }
 
         if (this.gameState === 'playing' || this.gameState === 'exiting') {
-            this.controls.update();
             const isColliding = this.physics.update(this.car, this.controls, deltaTime, this.level.boundaries);
             if (isColliding && !this.lastCollision && (Date.now() - this.lastCollisionTime > 1000)) { // at most once per second
                 this.collisionsCount++;
@@ -406,9 +420,13 @@ class ParkingGame {
     }
 
     render() {
-        // Apply screen shake effect
-        const shakeX = (Math.random() - 0.5) * this.shakeIntensity;
-        const shakeY = (Math.random() - 0.5) * this.shakeIntensity;
+        // Apply screen shake effect only during active gameplay
+        let shakeX = 0;
+        let shakeY = 0;
+        if (this.gameState === 'playing' || this.gameState === 'exiting' || this.gameState === 'parked') {
+            shakeX = (Math.random() - 0.5) * this.shakeIntensity;
+            shakeY = (Math.random() - 0.5) * this.shakeIntensity;
+        }
 
         this.ctx.save();
         this.ctx.translate(shakeX, shakeY);
@@ -420,7 +438,7 @@ class ParkingGame {
         // Draw level
         this.level.render(this.ctx);
 
-        // Draw car
+        // Draw car always
         this.car.render(this.ctx);
 
         // Draw collision visual effect
@@ -429,7 +447,26 @@ class ParkingGame {
         this.ctx.restore();
 
         // Draw UI overlays (not affected by shake)
-        if (this.gameState === 'parked') {
+        if (this.gameState === 'ready') {
+            // Semi-transparent overlay for ready state
+            this.ctx.fillStyle = 'rgba(0, 100, 200, 0.4)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            this.ctx.fillStyle = '#FFFFFF';
+            this.ctx.font = 'bold 28px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText('READY!', this.canvas.width / 2, this.canvas.height / 2 - 40);
+
+            this.ctx.font = '18px Arial';
+            const delayElapsed = Date.now() - this.readyDelayStart;
+            if (delayElapsed < 2000) {
+                const remaining = Math.ceil((2000 - delayElapsed) / 1000);
+                this.ctx.fillText(`Wait ${remaining}s...`, this.canvas.width / 2, this.canvas.height / 2);
+            } else {
+                this.ctx.fillText('Press arrow key or touch to start!', this.canvas.width / 2, this.canvas.height / 2);
+            }
+            this.ctx.textAlign = 'left';
+        } else if (this.gameState === 'parked') {
             // Semi-transparent overlay
             this.ctx.fillStyle = 'rgba(0, 100, 0, 0.7)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);

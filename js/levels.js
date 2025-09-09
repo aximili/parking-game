@@ -62,15 +62,15 @@ class Level {
 
         this.parkingSpot = {
             left: 300,
-            right: 350,
+            right: 355,
             top: 250,
             bottom: 350,
             angle: -Math.PI / 2 // Face up to match car orientation
         };
 
         this.exitArea = {
-            left: 700,
-            right: 750,
+            left: 640,
+            right: 720,
             top: 250,
             bottom: 350
         };
@@ -93,15 +93,15 @@ class Level {
 
         this.parkingSpot = {
             left: 300,
-            right: 345,
-            top: 210,
+            right: 350,
+            top: 200,
             bottom: 300,
             angle: -Math.PI / 2 // Face up
         };
 
         this.exitArea = {
             left: 650,
-            right: 700,
+            right: 710,
             top: 200,
             bottom: 300
         };
@@ -139,7 +139,7 @@ class Level {
         };
 
         this.exitArea = {
-            left: 700,
+            left: 690,
             right: 750,
             top: 250,
             bottom: 350
@@ -159,7 +159,11 @@ class Level {
             { left: 150, right: 200, top: 100, bottom: 300 },
             { left: 600, right: 650, top: 300, bottom: 500 },
             { left: 300, right: 350, top: 150, bottom: 250 },
-            { left: 450, right: 500, top: 350, bottom: 450 },
+
+            // Next to carpark
+            { left: 350, right: 390, top: 320, bottom: 420 },
+            { left: 460, right: 500, top: 350, bottom: 450 },
+
             { left: 250, right: 400, top: 200, bottom: 250 }
         ];
 
@@ -190,7 +194,9 @@ class Level {
             { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
             { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
 
-            // Middle wall
+            // Middle walls
+            { left: 250, right: 230, top: 50, bottom: 480 },
+            { left: 370, right: 400, top: 200, bottom: 550 },
             { left: 540, right: 580, top: 110, bottom: 490 },
 
             // Parked cars on the right
@@ -201,8 +207,8 @@ class Level {
         this.parkingSpot = {
             left: 650,
             right: 700,
-            top: 250,
-            bottom: 350,
+            top: 270,
+            bottom: 330,
         };
 
         this.exitArea = {
