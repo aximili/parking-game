@@ -30,9 +30,15 @@ class ParkingGame {
         // Mobile scaling
         this.isMobile = false;
         this.scale = 1;
+        this.dpr = window.devicePixelRatio || 1;
+
+        this.logicalWidth = 800;
+        this.logicalHeight = 600;
 
         this.init();
         this.gameLoop();
+
+        console.log('scale, dpr', this.scale, this.dpr);
     }
 
     init() {
@@ -40,33 +46,28 @@ class ParkingGame {
         this.setupEventListeners();
         this.detectDevice();
         this.applyScaling();
-        // Add resize listener for dynamic scaling and re-apply ctx scale if needed
+        // Add resize listener for dynamic scaling
         window.addEventListener('resize', () => {
             this.applyScaling();
-            if (this.scale < 1) {
-                this.ctx.scale(this.scale, this.scale);
-            } else {
-                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-            }
+            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         });
     }
 
     applyScaling() {
-        const originalHeight = 600;
-        this.scale = 1;
-        if (window.innerHeight < originalHeight) {
-            this.scale = Math.min(1, (window.innerHeight * 0.95) / originalHeight);
-            // if (this.scale < 1) {
-            //     const scaledWidth = 800 * this.scale;
-            //     const scaledHeight = originalHeight * this.scale;
-            //     this.canvas.style.width = `${scaledWidth}px`;
-            //     this.canvas.style.height = `${scaledHeight}px`;
-            //     return;
-            // }
+        this.scale = 1 / this.dpr;
+
+        if (window.innerHeight < this.logicalHeight) {
+
+            this.canvas.style.width = '100vw';
+            this.canvas.style.height = '100vh';
+            this.canvas.width = window.innerWidth * this.dpr;
+            this.canvas.height = window.innerHeight * this.dpr;
+
+            const scale = Math.min((window.innerWidth / this.logicalWidth), (window.innerHeight / this.logicalHeight));
+            this.scale = scale;
+            this.offsetX = (window.innerWidth - (this.logicalWidth * scale)) / 2;
+            this.offsetY = (window.innerHeight - (this.logicalHeight * scale)) / 2;
         }
-        // Full size
-        this.canvas.style.width = '800px';
-        this.canvas.style.height = '600px';
     }
 
     loadLevel(levelNumber) {
@@ -363,7 +364,7 @@ class ParkingGame {
         rumbleOsc.stop(this.audioContext.currentTime + 0.5);
     }
 
-    // Trigger collision visual effect
+    // Trigger collision visual effect (coordinates in logical space)
     triggerCollisionEffect(car, impactSpeed) {
         this.collisionEffect = {
             x: car.x,
@@ -374,7 +375,7 @@ class ParkingGame {
         };
     }
 
-    // Draw collision visual effect
+    // Draw collision visual effect (coordinates in logical space)
     drawCollisionEffect() {
         if (!this.collisionEffect) return;
 
@@ -393,7 +394,7 @@ class ParkingGame {
         this.ctx.save();
         this.ctx.globalAlpha = alpha;
         this.ctx.strokeStyle = '#ff4444';
-        this.ctx.lineWidth = 3;
+        this.ctx.lineWidth = 3 / this.scale; // Adjust line width for scaling
         this.ctx.beginPath();
         this.ctx.arc(this.collisionEffect.x, this.collisionEffect.y, radius, 0, Math.PI * 2);
         this.ctx.stroke();
@@ -434,10 +435,10 @@ class ParkingGame {
     }
 
     showSuccessEffect() {
-        // Simple visual effect
+        // Simple visual effect (in logical space)
         this.ctx.save();
         this.ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(0, 0, 800, 600);
         this.ctx.restore();
     }
 
@@ -463,11 +464,13 @@ class ParkingGame {
         }
 
         this.ctx.save();
+        this.ctx.scale(this.scale * this.dpr, this.scale * this.dpr);
+        this.ctx.translate(this.offsetX * this.dpr / 2, this.offsetY * this.dpr);
         this.ctx.translate(shakeX, shakeY);
 
-        // Clear canvas with background
+        // Clear canvas with background (using logical dimensions)
         this.ctx.fillStyle = '#2C2C2C';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
 
         // Draw level
         this.level.render(this.ctx);
@@ -478,52 +481,55 @@ class ParkingGame {
         // Draw collision visual effect
         this.drawCollisionEffect();
 
-        this.ctx.restore();
-
-        // Draw UI overlays (not affected by shake)
+        // Draw UI overlays (using logical dimensions)
         if (this.gameState === 'ready') {
             // Semi-transparent overlay for ready state
             this.ctx.fillStyle = 'rgba(0, 100, 200, 0.4)';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
 
             this.ctx.fillStyle = '#FFFFFF';
             this.ctx.font = 'bold 28px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('READY!', this.canvas.width / 2, this.canvas.height / 2 - 40);
+            this.ctx.fillText('READY!', this.logicalWidth / 2, this.logicalHeight / 2 - 40);
 
             this.ctx.font = '18px Arial';
             const delayElapsed = Date.now() - this.readyDelayStart;
             if (delayElapsed < 2000) {
                 const remaining = Math.ceil((2000 - delayElapsed) / 1000);
-                this.ctx.fillText(`Wait ${remaining}s...`, this.canvas.width / 2, this.canvas.height / 2);
+                this.ctx.fillText(`Wait ${remaining}s...`, this.logicalWidth / 2, this.logicalHeight / 2);
             } else {
-                this.ctx.fillText('Press arrow key or touch to start!', this.canvas.width / 2, this.canvas.height / 2);
+                this.ctx.fillText('Press arrow key or touch to start!', this.logicalWidth / 2, this.logicalHeight / 2);
             }
             this.ctx.textAlign = 'left';
         } else if (this.gameState === 'parked') {
             // Semi-transparent overlay
             this.ctx.fillStyle = 'rgba(0, 100, 0, 0.7)';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
 
             this.ctx.fillStyle = '#FFFFFF';
             this.ctx.font = 'bold 32px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('PARKED!', this.canvas.width / 2, this.canvas.height / 2 - 20);
+            this.ctx.fillText('PARKED!', this.logicalWidth / 2, this.logicalHeight / 2 - 20);
 
             this.ctx.font = '18px Arial';
-            this.ctx.fillText('Now drive to the EXIT', this.canvas.width / 2, this.canvas.height / 2 + 20);
+            this.ctx.fillText('Now drive to the EXIT', this.logicalWidth / 2, this.logicalHeight / 2 + 20);
             this.ctx.textAlign = 'left';
         } else if (this.gameState === 'completed') {
             // Semi-transparent overlay
             this.ctx.fillStyle = 'rgba(0, 0, 100, 0.7)';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillRect(0, 0, this.logicalWidth, this.logicalHeight);
 
             this.ctx.fillStyle = '#FFFFFF';
             this.ctx.font = 'bold 32px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('LEVEL COMPLETE!', this.canvas.width / 2, this.canvas.height / 2);
+            this.ctx.fillText('LEVEL COMPLETE!', this.logicalWidth / 2, this.logicalHeight / 2);
             this.ctx.textAlign = 'left';
         }
+
+        this.ctx.translate(-shakeX, -shakeY);
+        this.ctx.translate(-this.offsetX * this.dpr, -this.offsetY * this.dpr);
+        this.ctx.scale(1 / (this.scale * this.dpr), 1 / (this.scale * this.dpr));
+        this.ctx.restore();
 
         // Update timer display
         const timerEl = document.getElementById('timer');
