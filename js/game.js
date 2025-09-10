@@ -182,7 +182,7 @@ class ParkingGame {
             );
 
             // Check if car is nearly stopped (low speed)
-            const speedCheck = Math.abs(this.car.velocity) < 0.1;
+            const speedCheck = Math.abs(this.car.velocity) < 3;
 
             // Only require position and low speed - no angle requirement (like real parking)
             if (positionCheck && speedCheck) {

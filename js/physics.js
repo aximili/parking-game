@@ -4,9 +4,9 @@ class CarPhysics {
     constructor() {
         this.maxSpeed = 120; // pixels per second (reduced for better control)
         this.acceleration = 60; // pixels per second squared (2s to reach max speed: 120/2 = 60)
-        this.deceleration = 300; // pixels per second squared
+        this.deceleration = 300; // pixels per second squared (for braking)
         this.turnSpeed = Math.PI; // radians per second for full turn
-        this.friction = 0.8; // velocity multiplier per second (stronger deceleration)
+        this.friction = .95; // velocity multiplier per second (typically 0.95 - 0.99)
     }
 
     update(car, controls, deltaTime, boundaries) {
@@ -17,9 +17,17 @@ class CarPhysics {
 
         // Handle acceleration/deceleration
         if (controls.up) {
-            car.velocity += this.acceleration * deltaTime;
+            if (car.velocity < -2) { // Brake if moving backwards
+                car.velocity += this.deceleration * deltaTime;
+            } else { // Normal forward acceleration when stopped or already moving forward
+                car.velocity += this.acceleration * deltaTime;
+            }
         } else if (controls.down) {
-            car.velocity -= this.deceleration * deltaTime;
+            if (car.velocity > 2) { // Brake if moving forward
+                car.velocity -= this.deceleration * deltaTime;
+            } else { // Normal reverse acceleration when stopped or already reversing
+                car.velocity -= this.acceleration * deltaTime;
+            }
         } else {
             // Natural deceleration
             car.velocity *= Math.pow(this.friction, deltaTime * 60);
@@ -29,7 +37,7 @@ class CarPhysics {
         car.velocity = Math.max(-this.maxSpeed * 0.5, Math.min(this.maxSpeed, car.velocity));
 
         // Handle steering - realistic car steering with power steering effect
-        const maxSteeringAngle = Math.PI / 4; // 45 degrees max steering
+        const maxSteeringAngle = Math.PI * 40 / 180; // 40 degrees max steering
         const steeringSpeed = Math.PI * 1.5; // radians per second
 
         if (controls.left) {
@@ -38,11 +46,11 @@ class CarPhysics {
             car.steeringAngle = Math.min(car.steeringAngle + steeringSpeed * deltaTime, maxSteeringAngle);
         } else {
             // Power steering: only return to center when moving
-            if (Math.abs(car.velocity) > 1.0) { // Only when moving at reasonable speed
+            if (Math.abs(car.velocity) > 3) { // Only when moving at reasonable speed
                 if (Math.abs(car.steeringAngle) < 0.01) {
                     car.steeringAngle = 0;
                 } else {
-                    car.steeringAngle *= 0.85; // Very slow return when moving
+                    car.steeringAngle *= 0.94; // Very slow return when moving
                 }
             }
             // When stopped, steering stays where it is (no automatic centering)
