@@ -4,6 +4,7 @@ class ParkingGame {
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
         this.currentLevel = 1;
+        this.totalLevels = 7; // Total number of levels
         this.gameState = 'playing'; // playing, parked, exiting, completed
         this.car = null;
         this.level = null;
@@ -37,8 +38,6 @@ class ParkingGame {
 
         this.init();
         this.gameLoop();
-
-        console.log('scale, dpr', this.scale, this.dpr);
     }
 
     init() {
@@ -445,12 +444,12 @@ class ParkingGame {
     nextLevel() {
         this.currentLevel++;
         document.getElementById('level-select').value = this.currentLevel;
-        if (this.currentLevel <= 5) { // Assuming 5 levels
+        if (this.currentLevel <= this.totalLevels) {
             setTimeout(() => {
                 this.loadLevel(this.currentLevel);
             }, 2000);
         } else {
-            document.getElementById('instructions').textContent = 'Congratulations! All levels completed!';
+            document.getElementById('instructions').textContent = 'Congratulations! You can now drive on the road!';
         }
     }
 
