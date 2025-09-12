@@ -83,6 +83,7 @@ class Level {
         this.startAngle = -Math.PI / 2; // Face North
 
         this.instructions = ['Use the arrow keys to drive and park the car.', 'Excellent! Now drive to the exit!'];
+        this.proScore = 980;
     }
 
     generateLevel2() {
@@ -116,6 +117,7 @@ class Level {
         this.startAngle = -Math.PI / 2; // Face North
 
         this.instructions = ['Too easy? Now the parking spot is narrower.', 'Great job! Head to the exit!'];
+        this.proScore = 970;
     }
 
     generateLevel3() {
@@ -157,6 +159,7 @@ class Level {
         this.startAngle = -Math.PI / 2;  // Face North
 
         this.instructions = ['Imaging parking between the parked cars in a parking lot.', 'Well parked! Now exit the car park.'];
+        this.proScore = 960;
     }
 
     generateLevel4() {
@@ -196,6 +199,7 @@ class Level {
         this.startAngle = -Math.PI / 2; // Face North
 
         this.instructions = ['Navigate the obstacles to park in the tight space.', 'Success! Proceed to the exit. Watch the wall!'];
+        this.proScore = 955;
     }
 
     generateLevel5() {
@@ -235,6 +239,7 @@ class Level {
         this.startAngle = 0; // Face East
 
         this.instructions = ['That was too easy! Now let\'s park between two cars on the side of a street.', 'Perfect! Now drive all the way back to the exit!'];
+        this.proScore = 890;
     }
 
     generateLevel6() {
@@ -282,6 +287,7 @@ class Level {
         this.startAngle = -Math.PI / 2; // Face North
 
         this.instructions = ['(by Isko) Get the car out of this garage to the other.', 'Nicely done! Now see if you can exit.'];
+        this.proScore = 815;
     }
 
     generateLevel7() {
@@ -333,6 +339,7 @@ class Level {
         this.startAngle = 0; // Face east
 
         this.instructions = ['(by Isko) Try parking in the narrow garage.', 'Amazing! Now weave through the maze to the far exit!'];
+        this.proScore = 760;
     }
 
     render(ctx) {

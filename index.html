@@ -33,7 +33,10 @@
 
         <canvas id="game-canvas" width="800" height="600"></canvas>
 
-        <div id="completion-message" style="display:none;">Level Complete! Score: 0 (High: 0)</div>
+        <div id="completion-message">
+            <button id="close-completion" aria-label="Close">&times;</button>
+            <div id="completion-text"></div>
+        </div>
         <div id="mobile-controls-left" class="mobile-controls hidden">
             <button id="up-btn" class="control-btn">↑</button>
             <button id="down-btn" class="control-btn">↓</button>

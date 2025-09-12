@@ -190,7 +190,7 @@ body {
 }
 
 #completion-message {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -198,8 +198,28 @@ body {
     color: white;
     padding: 20px;
     border-radius: 10px;
-    text-align: center;
     font-size: 18px;
-    z-index: 10;
+    text-align: center;
+    max-width: 80%;
+    z-index: 1000;
+    white-space: pre-line;
+    /* Enable line breaks for \n characters */
+    line-height: 1.4;
     display: none;
+}
+
+#close-completion {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+#close-completion:hover {
+    color: #ccc;
 }

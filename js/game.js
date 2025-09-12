@@ -98,6 +98,18 @@ class ParkingGame {
             this.loadLevel(parseInt(e.target.value));
         });
 
+        // Close completion message handlers
+        document.getElementById('close-completion').addEventListener('click', () => {
+            document.getElementById('completion-message').style.display = 'none';
+        });
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('completion-message').style.display === 'block' &&
+                (e.key === 'Escape' ||
+                    (this.gameState === 'playing' && e.key.startsWith('Arrow')))) {
+                document.getElementById('completion-message').style.display = 'none';
+            }
+        });
+
         // Prevent default touch behaviors
         this.canvas.addEventListener('touchstart', (e) => e.preventDefault());
         this.canvas.addEventListener('touchmove', (e) => e.preventDefault());
@@ -218,17 +230,11 @@ class ParkingGame {
                 highScores[this.currentLevel] = Math.max(highScores[this.currentLevel] || 0, Math.floor(this.currentScore));
                 localStorage.setItem('highScores', JSON.stringify(highScores));
                 this.highScore = highScores[this.currentLevel];
-                const completionMsg = document.getElementById('completion-message');
-                if (completionMsg) {
-                    completionMsg.textContent = `Level Complete! Score: ${Math.floor(this.currentScore)} (High: ${this.highScore})`;
-                    completionMsg.style.display = 'block';
-                }
-                setTimeout(() => {
-                    const completionMsg = document.getElementById('completion-message');
-                    if (completionMsg) {
-                        completionMsg.style.display = 'none';
-                    }
-                }, 10000);
+                const completionText = document.getElementById('completion-text');
+                const message = this.getCompletionMessage(this.level, this.currentScore, this.collisionsCount);
+                const formattedMessage = message.replace(/\n/g, '<br>'); // Convert \n to HTML breaks if needed
+                completionText.innerHTML = `${formattedMessage}<br><small>Score: ${Math.floor(this.currentScore)} (High: ${this.highScore})</small>`;
+                document.getElementById('completion-message').style.display = 'block';
                 this.nextLevel();
             }
         }
@@ -546,6 +552,117 @@ class ParkingGame {
         if (collisionsEl) {
             collisionsEl.textContent = `Collisions: ${this.collisionsCount}`;
         }
+    }
+
+    getCompletionMessage(level, score, collisionCount) {
+        const proScore = level.proScore || 980; // Default to level 1 if not set
+
+        // Score tier messages
+        let baseMessage = '';
+        if (score >= (1000 - (1000 - proScore) * 0.8)) {
+            // Crazy tier
+            const crazyMessages = [
+                "Unbelievable! You're a parking legend!",
+                "Insane skills — Perfection personified!",
+                "Beyond pro level — Driving wizardry!",
+                "Cosmic parking mastery achieved!",
+                "You're basically teleporting that car!"
+            ];
+            baseMessage = crazyMessages[Math.floor(Math.random() * crazyMessages.length)];
+        } else if (score >= proScore) {
+            // Amazing tier
+            const amazingMessages = [
+                "Wow, you're an amazing driver! Perfect parking pro!",
+                "Legendary parking skills — Flawless execution!",
+                "Pro level mastery achieved!",
+                "Elite driver status unlocked!",
+                "Textbook perfection!"
+            ];
+            baseMessage = amazingMessages[Math.floor(Math.random() * amazingMessages.length)];
+        } else if (score > proScore * 0.85) {
+            // Great tier
+            const greatMessages = [
+                "Great job! Solid parking skills.",
+                "That was smooth — Nice work!",
+                "Impressive maneuvering!",
+                "Well executed — Professional level!",
+                "Smooth operator!"
+            ];
+            baseMessage = greatMessages[Math.floor(Math.random() * greatMessages.length)];
+        } else if (score > proScore * 0.5) {
+            // OK tier
+            const okMessages = [
+                "Good effort! Keep practicing those turns.",
+                "Not bad — Solid attempt!",
+                "You're getting the hang of it!",
+                "Respectable performance!",
+                "On the right track!"
+            ];
+            baseMessage = okMessages[Math.floor(Math.random() * okMessages.length)];
+        } else if (score > 0) {
+            // Poor tier
+            const poorMessages = [
+                "Tough level, but you'll nail it next time!",
+                "Close call. Sharpen those skills!",
+                "Every pro started somewhere!",
+                "Brave attempt — Progress made!",
+                "Better than nothing!"
+            ];
+            baseMessage = poorMessages[Math.floor(Math.random() * poorMessages.length)];
+        } else {
+            // Zero tier
+            const zeroMessages = [
+                "Oof, that was a wild ride! Time for a do-over?",
+                "The car put up a fight — Better luck next round!",
+                "Collision chaos! Let's try a gentler approach.",
+                "You made it... barely! Epic survival!",
+                "Parking? More like demolition derby win!"
+            ];
+            baseMessage = zeroMessages[Math.floor(Math.random() * zeroMessages.length)];
+        }
+
+        // Collision tier appendix
+        let collisionAppendix = '';
+        if (collisionCount === 0) {
+            // Perfect
+            const perfectMessages = [
+                "(Car still perfect — Zero damage!)",
+                "(Pristine condition — Flawless drive!)",
+                "(No scratches — Masterful control!)"
+            ];
+            collisionAppendix = perfectMessages[Math.floor(Math.random() * perfectMessages.length)];
+        } else if (collisionCount <= 3) {
+            // Little Damaged
+            const littleDamagedMessages = [
+                "(A little dinged up, but mostly fine)",
+                "(Minor bumps — No big deal!)",
+                "(Slight wear and tear — Still drivable)",
+                "(Couple of scrapes — Nothing serious)"
+            ];
+            collisionAppendix = littleDamagedMessages[Math.floor(Math.random() * littleDamagedMessages.length)];
+        } else if (collisionCount <= 10) {
+            // Ouch
+            const ouchMessages = [
+                "(Ouch, that hurt! Time for minor repairs)",
+                "(Several bumps — Car's complaining!)",
+                "(Rough ride — Body shop visit needed?)",
+                "(Your bumper's on vacation)",
+                "(Battered but not broken!)"
+            ];
+            collisionAppendix = ouchMessages[Math.floor(Math.random() * ouchMessages.length)];
+        } else {
+            // Broken
+            const brokenMessages = [
+                "(Broken car — It's a convertible now!)",
+                "(Car totaled! Call the scrapyard valet!)",
+                "(Frankenstein's monster mobile — Alive but limping!)",
+                "(Car therapy recommended after that ordeal!)",
+                "(Your mechanic is going to love your parking skills)"
+            ];
+            collisionAppendix = brokenMessages[Math.floor(Math.random() * brokenMessages.length)];
+        }
+
+        return baseMessage + "\n" + collisionAppendix;
     }
 
     gameLoop = (currentTime) => {
