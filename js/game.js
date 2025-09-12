@@ -86,6 +86,7 @@ class ParkingGame {
         this.lastCollisionTime = 0;
         this.currentScore = 0;
         document.getElementById('level-select').value = levelNumber;
+        document.getElementById('instructions').textContent = this.level.instructions[0];
     }
 
     setupEventListeners() {
@@ -191,7 +192,7 @@ class ParkingGame {
                 this.showSuccessEffect();
                 setTimeout(() => {
                     this.gameState = 'exiting';
-                    document.getElementById('instructions').textContent = 'Now exit to the road!';
+                    document.getElementById('instructions').textContent = this.level.instructions[1];
                 }, 2000);
             }
         }
@@ -449,7 +450,7 @@ class ParkingGame {
                 this.loadLevel(this.currentLevel);
             }, 2000);
         } else {
-            document.getElementById('instructions').textContent = 'Congratulations! You can now drive on the road!';
+            document.getElementById('instructions').textContent = this.level.instructions[0];
         }
     }
 

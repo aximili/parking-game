@@ -7,6 +7,7 @@ class Level {
         this.exitArea = {};
         this.startPosition = { x: 100, y: 300 };
         this.startAngle = 0;
+        this.instructions = [];
 
         // Initialize SVG images
         this.roadImage = new Image();
@@ -80,6 +81,8 @@ class Level {
 
         this.startPosition = { x: 100, y: 300 };
         this.startAngle = -Math.PI / 2; // Face North
+
+        this.instructions = ['Use the arrow keys to drive and park the car.', 'Excellent! Now drive to the exit!'];
     }
 
     generateLevel2() {
@@ -111,6 +114,8 @@ class Level {
 
         this.startPosition = { x: 100, y: 250 };
         this.startAngle = -Math.PI / 2; // Face North
+
+        this.instructions = ['Too easy? Now the parking spot is narrower.', 'Great job! Head to the exit!'];
     }
 
     generateLevel3() {
@@ -150,6 +155,8 @@ class Level {
 
         this.startPosition = { x: 100, y: 300 };
         this.startAngle = -Math.PI / 2;  // Face North
+
+        this.instructions = ['Imaging parking between the parked cars in a parking lot.', 'Well parked! Now exit the car park.'];
     }
 
     generateLevel4() {
@@ -187,6 +194,8 @@ class Level {
 
         this.startPosition = { x: 100, y: 350 };
         this.startAngle = -Math.PI / 2; // Face North
+
+        this.instructions = ['Navigate the obstacles to park in the tight space.', 'Success! Proceed to the exit. Watch the wall!'];
     }
 
     generateLevel5() {
@@ -200,16 +209,17 @@ class Level {
             // Middle walls
             { left: 250, right: 230, top: 50, bottom: 480 },
             { left: 370, right: 400, top: 200, bottom: 550 },
-            { left: 540, right: 580, top: 110, bottom: 490 },
+            { left: 460, right: 490, top: 120, bottom: 150 },
+            { left: 590, right: 630, top: 110, bottom: 490 },
 
             // Parked cars on the right
-            { left: 650, right: 700, top: 150, bottom: 250 }, // First parked car
-            { left: 650, right: 700, top: 350, bottom: 450 }  // Second parked car
+            { left: 700, right: 750, top: 150, bottom: 250 }, // First parked car
+            { left: 700, right: 750, top: 350, bottom: 450 }  // Second parked car
         ];
 
         this.parkingSpot = {
-            left: 650,
-            right: 700,
+            left: 700,
+            right: 750,
             top: 270,
             bottom: 330,
         };
@@ -223,6 +233,8 @@ class Level {
 
         this.startPosition = { x: 150, y: 300 };
         this.startAngle = 0; // Face East
+
+        this.instructions = ['That was too easy! Now let\'s park between two cars on the side of a street.', 'Perfect! Now drive all the way back to the exit!'];
     }
 
     generateLevel6() {
@@ -268,6 +280,8 @@ class Level {
 
         this.startPosition = { x: 80, y: 420 };
         this.startAngle = -Math.PI / 2; // Face North
+
+        this.instructions = ['(by Isko) Get the car out of this garage to the other.', 'Nicely done! Now see if you can exit.'];
     }
 
     generateLevel7() {
@@ -317,6 +331,8 @@ class Level {
 
         this.startPosition = { x: 200, y: 530 };
         this.startAngle = 0; // Face east
+
+        this.instructions = ['(by Isko) Try parking in the narrow garage.', 'Amazing! Now weave through the maze to the far exit!'];
     }
 
     render(ctx) {
