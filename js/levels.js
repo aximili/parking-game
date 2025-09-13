@@ -318,7 +318,7 @@ class Level {
             { left: 400, right: 450, top: 450, bottom: 500 },
 
             { left: 200, right: 250, top: 50, bottom: 100 },
-            { left: 700, right: 750, top: 50, bottom: 100 },
+            { left: 600, right: 750, top: 50, bottom: 100 },
         ];
 
         this.parkingSpot = {
