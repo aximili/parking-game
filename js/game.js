@@ -15,6 +15,7 @@ class ParkingGame {
         this.startTime = 0;
         this.timerStarted = false;
         this.audioContext = null;
+        this.masterGain = null;
         this.lastCrashTime = 0;
         this.lastCollisionTime = 0;
         this.collisionEffect = null; // For visual collision feedback
@@ -49,6 +50,27 @@ class ParkingGame {
             this.applyScaling();
             this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         });
+
+        // Audio initialization
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (!this.masterGain) {
+            this.masterGain = this.audioContext.createGain();
+            this.masterGain.connect(this.audioContext.destination);
+        }
+        const slider = document.getElementById('volume-slider');
+        if (slider) {
+            const savedVolume = localStorage.getItem('volume') || '100';
+            slider.value = savedVolume;
+            this.masterGain.gain.value = parseInt(savedVolume) / 100;
+            slider.addEventListener('input', (e) => {
+                const volume = e.target.value;
+                console.log('Volume changed to:', volume);
+                this.masterGain.gain.value = parseInt(volume) / 100;
+                localStorage.setItem('volume', volume);
+            });
+        }
     }
 
     applyScaling() {
@@ -241,9 +263,6 @@ class ParkingGame {
 
     playSuccessSound() {
         // Enhanced celebratory rising chime using multiple oscillators
-        if (!this.audioContext) {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
         }
@@ -255,7 +274,7 @@ class ParkingGame {
         const gain1 = this.audioContext.createGain();
         osc1.type = 'sine';
         osc1.connect(gain1);
-        gain1.connect(this.audioContext.destination);
+        gain1.connect(this.masterGain);
         osc1.frequency.value = 600;
         gain1.gain.setValueAtTime(0.3, now);
         gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
@@ -267,7 +286,7 @@ class ParkingGame {
         const gain2 = this.audioContext.createGain();
         osc2.type = 'sine';
         osc2.connect(gain2);
-        gain2.connect(this.audioContext.destination);
+        gain2.connect(this.masterGain);
         osc2.frequency.value = 800;
         gain2.gain.setValueAtTime(0.3, now + 0.1);
         gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
@@ -279,7 +298,7 @@ class ParkingGame {
         const gain3 = this.audioContext.createGain();
         osc3.type = 'sine';
         osc3.connect(gain3);
-        gain3.connect(this.audioContext.destination);
+        gain3.connect(this.masterGain);
         osc3.frequency.value = 1000;
         gain3.gain.setValueAtTime(0.3, now + 0.2);
         gain3.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
@@ -289,9 +308,6 @@ class ParkingGame {
 
     playExitSound() {
         // Enhanced triumphant ascending tone with dual oscillators for whoosh effect
-        if (!this.audioContext) {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
         }
@@ -303,7 +319,7 @@ class ParkingGame {
         const mainGain = this.audioContext.createGain();
         mainOsc.type = 'sine';
         mainOsc.connect(mainGain);
-        mainGain.connect(this.audioContext.destination);
+        mainGain.connect(this.masterGain);
         mainOsc.frequency.setValueAtTime(1400, now);
         mainOsc.frequency.linearRampToValueAtTime(4500, now + 0.4);
         mainGain.gain.setValueAtTime(0.3, now);
@@ -316,7 +332,7 @@ class ParkingGame {
         const harmGain = this.audioContext.createGain();
         harmOsc.type = 'square';
         harmOsc.connect(harmGain);
-        harmGain.connect(this.audioContext.destination);
+        harmGain.connect(this.masterGain);
         harmOsc.frequency.setValueAtTime(700, now);
         harmOsc.frequency.linearRampToValueAtTime(2250, now + 0.4);
         harmGain.gain.setValueAtTime(0.15, now);
@@ -332,9 +348,6 @@ class ParkingGame {
         this.lastCrashTime = currentTime;
 
         // Enhanced crash sound with dual-oscillator rumble for impact
-        if (!this.audioContext) {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
         }
@@ -344,7 +357,7 @@ class ParkingGame {
         const mainGain = this.audioContext.createGain();
         mainOsc.type = 'sawtooth';
         mainOsc.connect(mainGain);
-        mainGain.connect(this.audioContext.destination);
+        mainGain.connect(this.masterGain);
 
         mainOsc.frequency.setValueAtTime(50, this.audioContext.currentTime);
         mainOsc.frequency.setValueAtTime(25, this.audioContext.currentTime + 0.1);
@@ -356,7 +369,7 @@ class ParkingGame {
         const rumbleGain = this.audioContext.createGain();
         rumbleOsc.type = 'sine';
         rumbleOsc.connect(rumbleGain);
-        rumbleGain.connect(this.audioContext.destination);
+        rumbleGain.connect(this.masterGain);
 
         rumbleOsc.frequency.setValueAtTime(10, this.audioContext.currentTime);
         rumbleOsc.frequency.setValueAtTime(5, this.audioContext.currentTime + 0.2);

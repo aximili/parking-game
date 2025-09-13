@@ -223,3 +223,111 @@ body {
 #close-completion:hover {
     color: #ccc;
 }
+
+
+#volume-icon {
+    position: absolute;
+    bottom: 240px;
+    right: -55px;
+    font-size: 24px;
+    color: rgba(255, 255, 255, 1);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#volume-wrapper {
+    position: absolute;
+    bottom: 20px;
+    right: -80px;
+    height: 200px;
+    width: 30px;
+    transform: rotate(-90deg);
+    transform-origin: bottom left;
+    z-index: 10;
+}
+
+#volume-slider {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200px;
+    height: 30px;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    pointer-events: auto;
+}
+
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -8px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    cursor: ns-resize;
+}
+
+#volume-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    backdrop-filter: blur(10px);
+}
+
+#volume-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#volume-slider::-moz-range-track {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    border: none;
+}
+
+/* Responsive adjustment for mobile */
+@media (max-width: 900px) {
+    #volume-icon {
+        bottom: 170px;
+    }
+
+    #volume-wrapper {
+        bottom: 10px;
+        right: -70px;
+        height: 150px;
+        width: 25px;
+    }
+
+    #volume-slider {
+        width: 150px;
+        height: 25px;
+    }
+
+    #volume-slider::-webkit-slider-thumb,
+    #volume-slider::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+    }
+}
