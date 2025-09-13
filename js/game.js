@@ -22,7 +22,6 @@ class ParkingGame {
         this.lastCollision = false;
         this.currentScore = 0;
         this.highScore = 0;
-        this.showScore = true;
 
         // Screen shake effect for collisions
         this.shakeIntensity = 0;
@@ -540,11 +539,11 @@ class ParkingGame {
         // Update timer display
         const timerEl = document.getElementById('timer');
         if (timerEl) {
-            timerEl.textContent = `Time: ${this.elapsedTime.toFixed(1)}s`;
+            timerEl.textContent = `Time: ${this.elapsedTime.toFixed(0)}s`;
         }
 
         const scoreEl = document.getElementById('score');
-        if (scoreEl && this.showScore) {
+        if (scoreEl) {
             scoreEl.textContent = `Score: ${Math.floor(this.currentScore)}`;
         }
 
