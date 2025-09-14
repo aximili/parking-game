@@ -684,14 +684,22 @@ class ParkingGame {
                 "(Couple of scrapes — Nothing serious)"
             ];
             collisionAppendix = littleDamagedMessages[Math.floor(Math.random() * littleDamagedMessages.length)];
-        } else if (collisionCount <= 10) {
+        } else if (collisionCount <= 8) {
+            // Moderately Banged Up
+            const moderateMessages = [
+                "(Moderately banged up — Still street-legal!)",
+                "(Several bumps — Car's complaining!)",
+                "(Your bumper's on vacation)",
+                "(Dented but determined — Keep going!)"
+            ];
+            collisionAppendix = moderateMessages[Math.floor(Math.random() * moderateMessages.length)];
+        } else if (collisionCount <= 16) {
             // Ouch
             const ouchMessages = [
-                "(Ouch, that hurt! Time for minor repairs)",
-                "(Several bumps — Car's complaining!)",
+                "(Ouch, that hurt! Time for major repairs)",
                 "(Rough ride — Body shop visit needed?)",
-                "(Your bumper's on vacation)",
-                "(Battered but not broken!)"
+                "(Battered but not broken!)",
+                "(Your mechanic is going to love your parking skills)"
             ];
             collisionAppendix = ouchMessages[Math.floor(Math.random() * ouchMessages.length)];
         } else {
@@ -699,9 +707,8 @@ class ParkingGame {
             const brokenMessages = [
                 "(Broken car — It's a convertible now!)",
                 "(Car totaled! Call the scrapyard valet!)",
+                "(Broken car — Time for a new car!)",
                 "(Frankenstein's monster mobile — Alive but limping!)",
-                "(Car therapy recommended after that ordeal!)",
-                "(Your mechanic is going to love your parking skills)"
             ];
             collisionAppendix = brokenMessages[Math.floor(Math.random() * brokenMessages.length)];
         }
