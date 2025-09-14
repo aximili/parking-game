@@ -25,321 +25,318 @@ class Level {
     }
 
     generateLevel() {
-        switch (this.levelNumber) {
-            case 1:
-                this.generateLevel1();
-                break;
-            case 2:
-                this.generateLevel2();
-                break;
-            case 3:
-                this.generateLevel3();
-                break;
-            case 4:
-                this.generateLevel4();
-                break;
-            case 5:
-                this.generateLevel5();
-                break;
-            case 6:
-                this.generateLevel6();
-                break;
-            case 7:
-                this.generateLevel7();
-                break;
-            default:
-                this.generateLevel1();
+        let config = Level.levelConfigs[this.levelNumber - 1];
+
+        if (!config) {
+            this.levelNumber = 1;
+            config = Level.levelConfigs[this.levelNumber - 1];
         }
+
+        this.boundaries = config.boundaries;
+        this.parkingSpot = config.parkingSpot;
+        this.exitArea = config.exitArea;
+        this.startPosition = config.startPosition;
+        this.startAngle = config.startAngle;
+        this.instructions = config.instructions;
+        this.proScore = config.proScore;
     }
 
-    generateLevel1() {
-        // Simple level: straight parking
-        this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
-            { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
-            { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
-            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
-            // Parking lot obstacles
-            { left: 200, right: 250, top: 200, bottom: 400 },
-            { left: 550, right: 600, top: 200, bottom: 400 }
+    static get levelConfigs() {
+        return [
+            // Level 1: Simple straight parking
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+                    { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+                    { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+                    { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+                    // Parking lot obstacles
+                    { left: 200, right: 250, top: 200, bottom: 400 },
+                    { left: 550, right: 600, top: 200, bottom: 400 }
+                ],
+                parkingSpot: {
+                    left: 300,
+                    right: 365,
+                    top: 250,
+                    bottom: 350,
+                    angle: -Math.PI / 2 // Face North
+                },
+                exitArea: {
+                    left: 640,
+                    right: 720,
+                    top: 250,
+                    bottom: 350
+                },
+                startPosition: { x: 100, y: 300 },
+                startAngle: -Math.PI / 2, // Face North
+                instructions: ['Use the arrow keys to drive (Best on PC/laptop). Park the car inside the yellow area.', 'Excellent! Now drive to the exit!'],
+                proScore: 980
+            },
+
+            // Level 2: Just a little narrower
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 },
+                    { left: 0, right: 50, top: 0, bottom: 600 },
+                    { left: 750, right: 800, top: 0, bottom: 600 },
+                    { left: 0, right: 800, top: 550, bottom: 600 },
+                    { left: 200, right: 250, top: 150, bottom: 450 },
+                    { left: 550, right: 600, top: 150, bottom: 450 },
+                    { left: 350, right: 450, top: 100, bottom: 150 }
+                ],
+                parkingSpot: {
+                    left: 300,
+                    right: 350,
+                    top: 200,
+                    bottom: 300,
+                    angle: -Math.PI / 2 // Face up
+                },
+                exitArea: {
+                    left: 650,
+                    right: 710,
+                    top: 200,
+                    bottom: 300
+                },
+                startPosition: { x: 100, y: 250 },
+                startAngle: -Math.PI / 2, // Face North
+                instructions: ['Too easy? Now the parking spot is narrower.', 'Great job! Head to the exit!'],
+                proScore: 970
+            },
+
+            // Level 3: Realistic parking lot with parallel parked cars
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+                    { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+                    { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+                    { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
+                    // Parked cars as obstacles
+                    { left: 250, right: 290, top: 100, bottom: 200 }, // Left parked car
+                    { left: 380, right: 420, top: 100, bottom: 200 }, // Right parked car
+
+                    // Additional parked cars for realism
+                    { left: 190, right: 230, top: 100, bottom: 200 }, // Another left car
+                    { left: 440, right: 480, top: 100, bottom: 200 },  // Another right car
+
+                    // Side of road
+                    { left: 180, right: 500, top: 260, bottom: 280 },
+                ],
+                parkingSpot: {
+                    left: 310,
+                    right: 360,
+                    top: 100,
+                    bottom: 200,
+                    angle: -Math.PI / 2
+                },
+                exitArea: {
+                    left: 690,
+                    right: 750,
+                    top: 250,
+                    bottom: 350
+                },
+                startPosition: { x: 100, y: 300 },
+                startAngle: -Math.PI / 2,  // Face North
+                instructions: ['Imaging parking between the parked cars in a parking lot.', 'Well parked! Now exit the car park.'],
+                proScore: 960
+            },
+
+            // Level 4: Tricky angle and obstacles
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 },
+                    { left: 0, right: 50, top: 0, bottom: 600 },
+                    { left: 750, right: 800, top: 0, bottom: 600 },
+                    { left: 0, right: 800, top: 550, bottom: 600 },
+                    { left: 150, right: 200, top: 100, bottom: 300 },
+                    { left: 600, right: 650, top: 300, bottom: 500 },
+                    { left: 300, right: 350, top: 150, bottom: 250 },
+
+                    // Next to carpark
+                    { left: 350, right: 390, top: 320, bottom: 420 },
+                    { left: 460, right: 500, top: 350, bottom: 450 },
+
+                    { left: 250, right: 400, top: 200, bottom: 250 }
+                ],
+                parkingSpot: {
+                    left: 400,
+                    right: 450,
+                    top: 300,
+                    bottom: 400,
+                    angle: -Math.PI / 2 // Face up
+                },
+                exitArea: {
+                    left: 650,
+                    right: 700,
+                    top: 300,
+                    bottom: 400
+                },
+                startPosition: { x: 100, y: 350 },
+                startAngle: -Math.PI / 2, // Face North
+                instructions: ['Navigate the obstacles to park in the tight space.', 'Success! Proceed to the exit. Watch the wall!'],
+                proScore: 955
+            },
+
+            // Level 5: Parallel parking scenario on the side of a street
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+                    { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+                    { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+                    { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
+                    // Middle walls
+                    { left: 250, right: 230, top: 50, bottom: 480 },
+                    { left: 370, right: 400, top: 200, bottom: 550 },
+                    { left: 460, right: 490, top: 120, bottom: 150 },
+                    { left: 590, right: 630, top: 110, bottom: 490 },
+
+                    // Parked cars on the right
+                    { left: 700, right: 750, top: 150, bottom: 250 }, // First parked car
+                    { left: 700, right: 750, top: 350, bottom: 450 }  // Second parked car
+                ],
+                parkingSpot: {
+                    left: 700,
+                    right: 750,
+                    top: 270,
+                    bottom: 330,
+                },
+                exitArea: {
+                    left: 50,
+                    right: 100,
+                    top: 250,
+                    bottom: 350
+                },
+                startPosition: { x: 150, y: 300 },
+                startAngle: 0, // Face East
+                instructions: ['That was too easy! Now let\'s park between two cars on the side of a street.', 'Perfect! Now drive all the way back to the exit!'],
+                proScore: 890
+            },
+
+            // Level 6: by Isko
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+                    { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+                    { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+                    { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
+                    // Obstacles
+                    { left: 50, right: 150, top: 350, bottom: 380 },
+                    { left: 120, right: 150, top: 350, bottom: 490 },
+                    { left: 210, right: 250, top: 450, bottom: 550 },
+                    { left: 210, right: 250, top: 300, bottom: 400 },
+                    { left: 310, right: 350, top: 150, bottom: 250 },
+
+                    { left: 200, right: 350, top: 100, bottom: 150 },
+                    { left: 200, right: 240, top: 150, bottom: 250 },
+                    { left: 310, right: 350, top: 400, bottom: 450 },
+                    { left: 350, right: 390, top: 50, bottom: 100 },
+                    { left: 460, right: 590, top: 100, bottom: 460 },
+
+                    { left: 590, right: 650, top: 460, bottom: 550 },
+                    { left: 650, right: 750, top: 300, bottom: 390 },
+                    { left: 650, right: 750, top: 100, bottom: 190 },
+                ],
+                parkingSpot: {
+                    left: 240,
+                    right: 310,
+                    top: 150,
+                    bottom: 250,
+                    angle: 0 // Supposed to face right but doesn't work
+                },
+                exitArea: {
+                    left: 650,
+                    right: 750,
+                    top: 500,
+                    bottom: 550,
+                },
+                startPosition: { x: 80, y: 420 },
+                startAngle: -Math.PI / 2, // Face North
+                instructions: ['(by Isko) Get the car out of this garage to the other.', 'Nicely done! Brrm brrm! Now see if you can exit.'],
+                proScore: 815
+            },
+
+            // Level 7: Maze by Isko
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+                    { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+                    { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+                    { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
+                    // Obstacles
+                    { left: 100, right: 150, top: 450, bottom: 550 },
+                    { left: 50, right: 250, top: 300, bottom: 350 },
+                    { left: 200, right: 300, top: 350, bottom: 450 },
+                    { left: 500, right: 600, top: 400, bottom: 450 },
+                    { left: 250, right: 400, top: 400, bottom: 450 },
+
+                    { left: 450, right: 600, top: 150, bottom: 200 },
+                    { left: 650, right: 700, top: 150, bottom: 550 },
+                    { left: 400, right: 550, top: 300, bottom: 350 },
+                    { left: 550, right: 600, top: 300, bottom: 400 },
+                    { left: 600, right: 650, top: 250, bottom: 300 },
+
+                    { left: 400, right: 450, top: 200, bottom: 300 },
+                    { left: 250, right: 350, top: 200, bottom: 250 },
+                    { left: 350, right: 450, top: 100, bottom: 250 },
+                    { left: 100, right: 200, top: 100, bottom: 200 },
+                    { left: 400, right: 450, top: 450, bottom: 500 },
+
+                    { left: 200, right: 250, top: 50, bottom: 100 },
+                    { left: 600, right: 750, top: 50, bottom: 100 },
+                ],
+                parkingSpot: {
+                    left: 50,
+                    right: 100,
+                    top: 450,
+                    bottom: 550,
+                },
+                exitArea: {
+                    left: 700,
+                    right: 750,
+                    top: 450,
+                    bottom: 550,
+                },
+                startPosition: { x: 200, y: 530 },
+                startAngle: 0, // Face east
+                instructions: ['(by Isko) Try parking in the narrow garage.', 'Amazing! Now weave through the maze to the far exit!'],
+                proScore: 760
+            },
+
+            // Level 8: by Mimin
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+                    { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+                    { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+                    { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
+                    // Obstacles
+                    { left: 150, right: 250, top: 200, bottom: 300 },
+                    { left: 50, right: 450, top: 350, bottom: 400 },
+                    { left: 400, right: 450, top: 50, bottom: 250 },
+                    { left: 550, right: 750, top: 100, bottom: 300 },
+                ],
+                parkingSpot: {
+                    left: 350,
+                    right: 450,
+                    top: 250,
+                    bottom: 350,
+                },
+                exitArea: {
+                    left: 450,
+                    right: 750,
+                    top: 350,
+                    bottom: 400,
+                },
+                startPosition: { x: 80, y: 200 },
+                startAngle: -Math.PI / 2, // Face North
+                instructions: ['(by Niko) Nice work. Now let\'s relax.', 'Now just let the arrow keys do the work.'],
+                proScore: 975
+            }
         ];
-
-        this.parkingSpot = {
-            left: 300,
-            right: 365,
-            top: 250,
-            bottom: 350,
-            angle: -Math.PI / 2 // Face North
-        };
-
-        this.exitArea = {
-            left: 640,
-            right: 720,
-            top: 250,
-            bottom: 350
-        };
-
-        this.startPosition = { x: 100, y: 300 };
-        this.startAngle = -Math.PI / 2; // Face North
-
-        this.instructions = ['Use the arrow keys to drive and park the car.', 'Excellent! Now drive to the exit!'];
-        this.proScore = 980;
-    }
-
-    generateLevel2() {
-        // Angled parking
-        this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 },
-            { left: 0, right: 50, top: 0, bottom: 600 },
-            { left: 750, right: 800, top: 0, bottom: 600 },
-            { left: 0, right: 800, top: 550, bottom: 600 },
-            { left: 200, right: 250, top: 150, bottom: 450 },
-            { left: 550, right: 600, top: 150, bottom: 450 },
-            { left: 350, right: 450, top: 100, bottom: 150 }
-        ];
-
-        this.parkingSpot = {
-            left: 300,
-            right: 350,
-            top: 200,
-            bottom: 300,
-            angle: -Math.PI / 2 // Face up
-        };
-
-        this.exitArea = {
-            left: 650,
-            right: 710,
-            top: 200,
-            bottom: 300
-        };
-
-        this.startPosition = { x: 100, y: 250 };
-        this.startAngle = -Math.PI / 2; // Face North
-
-        this.instructions = ['Too easy? Now the parking spot is narrower.', 'Great job! Head to the exit!'];
-        this.proScore = 970;
-    }
-
-    generateLevel3() {
-        // Realistic parking lot with parallel parked cars
-        this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
-            { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
-            { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
-            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
-
-            // Parked cars as obstacles
-            { left: 250, right: 290, top: 100, bottom: 200 }, // Left parked car
-            { left: 380, right: 420, top: 100, bottom: 200 }, // Right parked car
-
-            // Additional parked cars for realism
-            { left: 190, right: 230, top: 100, bottom: 200 }, // Another left car
-            { left: 440, right: 480, top: 100, bottom: 200 },  // Another right car
-
-            // Side of road
-            { left: 180, right: 500, top: 260, bottom: 280 },
-        ];
-
-        this.parkingSpot = {
-            left: 310,
-            right: 360,
-            top: 100,
-            bottom: 200,
-            angle: -Math.PI / 2
-        };
-
-        this.exitArea = {
-            left: 690,
-            right: 750,
-            top: 250,
-            bottom: 350
-        };
-
-        this.startPosition = { x: 100, y: 300 };
-        this.startAngle = -Math.PI / 2;  // Face North
-
-        this.instructions = ['Imaging parking between the parked cars in a parking lot.', 'Well parked! Now exit the car park.'];
-        this.proScore = 960;
-    }
-
-    generateLevel4() {
-        // Tricky angle and obstacles
-        this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 },
-            { left: 0, right: 50, top: 0, bottom: 600 },
-            { left: 750, right: 800, top: 0, bottom: 600 },
-            { left: 0, right: 800, top: 550, bottom: 600 },
-            { left: 150, right: 200, top: 100, bottom: 300 },
-            { left: 600, right: 650, top: 300, bottom: 500 },
-            { left: 300, right: 350, top: 150, bottom: 250 },
-
-            // Next to carpark
-            { left: 350, right: 390, top: 320, bottom: 420 },
-            { left: 460, right: 500, top: 350, bottom: 450 },
-
-            { left: 250, right: 400, top: 200, bottom: 250 }
-        ];
-
-        this.parkingSpot = {
-            left: 400,
-            right: 450,
-            top: 300,
-            bottom: 400,
-            angle: -Math.PI / 2 // Face up
-        };
-
-        this.exitArea = {
-            left: 650,
-            right: 700,
-            top: 300,
-            bottom: 400
-        };
-
-        this.startPosition = { x: 100, y: 350 };
-        this.startAngle = -Math.PI / 2; // Face North
-
-        this.instructions = ['Navigate the obstacles to park in the tight space.', 'Success! Proceed to the exit. Watch the wall!'];
-        this.proScore = 955;
-    }
-
-    generateLevel5() {
-        // Parallel parking scenario on the side of a street
-        this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
-            { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
-            { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
-            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
-
-            // Middle walls
-            { left: 250, right: 230, top: 50, bottom: 480 },
-            { left: 370, right: 400, top: 200, bottom: 550 },
-            { left: 460, right: 490, top: 120, bottom: 150 },
-            { left: 590, right: 630, top: 110, bottom: 490 },
-
-            // Parked cars on the right
-            { left: 700, right: 750, top: 150, bottom: 250 }, // First parked car
-            { left: 700, right: 750, top: 350, bottom: 450 }  // Second parked car
-        ];
-
-        this.parkingSpot = {
-            left: 700,
-            right: 750,
-            top: 270,
-            bottom: 330,
-        };
-
-        this.exitArea = {
-            left: 50,
-            right: 100,
-            top: 250,
-            bottom: 350
-        };
-
-        this.startPosition = { x: 150, y: 300 };
-        this.startAngle = 0; // Face East
-
-        this.instructions = ['That was too easy! Now let\'s park between two cars on the side of a street.', 'Perfect! Now drive all the way back to the exit!'];
-        this.proScore = 890;
-    }
-
-    generateLevel6() {
-        // by Isko
-        this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
-            { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
-            { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
-            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
-
-            // Obstacles
-            { left: 50, right: 150, top: 350, bottom: 380 },
-            { left: 120, right: 150, top: 350, bottom: 490 },
-            { left: 210, right: 250, top: 450, bottom: 550 },
-            { left: 210, right: 250, top: 300, bottom: 400 },
-            { left: 310, right: 350, top: 150, bottom: 250 },
-
-            { left: 200, right: 350, top: 100, bottom: 150 },
-            { left: 200, right: 240, top: 150, bottom: 250 },
-            { left: 310, right: 350, top: 400, bottom: 450 },
-            { left: 350, right: 390, top: 50, bottom: 100 },
-            { left: 460, right: 590, top: 100, bottom: 460 },
-
-            { left: 590, right: 650, top: 460, bottom: 550 },
-            { left: 650, right: 750, top: 300, bottom: 390 },
-            { left: 650, right: 750, top: 100, bottom: 190 },
-        ];
-
-        this.parkingSpot = {
-            left: 240,
-            right: 310,
-            top: 150,
-            bottom: 250,
-            angle: 0 // Supposed to face right but doesn't work
-        };
-
-        this.exitArea = {
-            left: 650,
-            right: 750,
-            top: 500,
-            bottom: 550,
-        };
-
-        this.startPosition = { x: 80, y: 420 };
-        this.startAngle = -Math.PI / 2; // Face North
-
-        this.instructions = ['(by Isko) Get the car out of this garage to the other.', 'Nicely done! Now see if you can exit.'];
-        this.proScore = 815;
-    }
-
-    generateLevel7() {
-        // by Isko
-        this.boundaries = [
-            { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
-            { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
-            { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
-            { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
-
-            // Obstacles
-            { left: 100, right: 150, top: 450, bottom: 550 },
-            { left: 50, right: 250, top: 300, bottom: 350 },
-            { left: 200, right: 300, top: 350, bottom: 450 },
-            { left: 500, right: 600, top: 400, bottom: 450 },
-            { left: 250, right: 400, top: 400, bottom: 450 },
-
-            { left: 450, right: 600, top: 150, bottom: 200 },
-            { left: 650, right: 700, top: 150, bottom: 550 },
-            { left: 400, right: 550, top: 300, bottom: 350 },
-            { left: 550, right: 600, top: 300, bottom: 400 },
-            { left: 600, right: 650, top: 250, bottom: 300 },
-
-            { left: 400, right: 450, top: 200, bottom: 300 },
-            { left: 250, right: 350, top: 200, bottom: 250 },
-            { left: 350, right: 450, top: 100, bottom: 250 },
-            { left: 100, right: 200, top: 100, bottom: 200 },
-            { left: 400, right: 450, top: 450, bottom: 500 },
-
-            { left: 200, right: 250, top: 50, bottom: 100 },
-            { left: 600, right: 750, top: 50, bottom: 100 },
-        ];
-
-        this.parkingSpot = {
-            left: 50,
-            right: 100,
-            top: 450,
-            bottom: 550,
-        };
-
-        this.exitArea = {
-            left: 700,
-            right: 750,
-            top: 450,
-            bottom: 550,
-        };
-
-        this.startPosition = { x: 200, y: 530 };
-        this.startAngle = 0; // Face east
-
-        this.instructions = ['(by Isko) Try parking in the narrow garage.', 'Amazing! Now weave through the maze to the far exit!'];
-        this.proScore = 760;
     }
 
     render(ctx) {

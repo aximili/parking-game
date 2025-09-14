@@ -4,7 +4,6 @@ class ParkingGame {
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
         this.currentLevel = 1;
-        this.totalLevels = 7; // Total number of levels
         this.gameState = 'playing'; // playing, parked, exiting, completed
         this.car = null;
         this.level = null;
@@ -382,6 +381,35 @@ class ParkingGame {
         rumbleOsc.stop(this.audioContext.currentTime + 0.5);
     }
 
+    playCongratsSound() {
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+
+        const now = this.audioContext.currentTime;
+        const notes = [
+            { freq: 1046.5, start: 0 },    // Do (C8)
+            { freq: 1318.5, start: 0.1 }, // Mi (E8)
+            { freq: 1568.0, start: 0.2 },  // Sol (G8)
+            { freq: 2093, start: 0.3 }, // Do
+            { freq: 1568.0, start: 0.6 },  // Sol
+            { freq: 2093, start: 0.7 }  // Do
+        ];
+
+        notes.forEach((note, index) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            osc.type = 'sine';
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+            osc.frequency.value = note.freq;
+            gain.gain.setValueAtTime(0.3, now + note.start);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + note.start + 0.2);
+            osc.start(now + note.start);
+            osc.stop(now + note.start + 0.2);
+        });
+    }
+
     // Trigger collision visual effect (coordinates in logical space)
     triggerCollisionEffect(car, impactSpeed) {
         this.collisionEffect = {
@@ -462,13 +490,17 @@ class ParkingGame {
 
     nextLevel() {
         this.currentLevel++;
-        document.getElementById('level-select').value = this.currentLevel;
-        if (this.currentLevel <= this.totalLevels) {
+        if (this.currentLevel <= Level.levelConfigs.length) {
+            document.getElementById('level-select').value = this.currentLevel;
             setTimeout(() => {
                 this.loadLevel(this.currentLevel);
             }, 2000);
         } else {
-            document.getElementById('instructions').textContent = this.level.instructions[0];
+            this.currentLevel--;
+            document.getElementById('instructions').textContent = 'Congratulations! You have completed all levels!';
+            setTimeout(() => {
+                this.playCongratsSound();
+            }, 1500);
         }
     }
 
@@ -578,7 +610,7 @@ class ParkingGame {
                 "Insane skills — Perfection personified!",
                 "Beyond pro level — Driving wizardry!",
                 "Cosmic parking mastery achieved!",
-                "You're basically teleporting that car!"
+                "Wow! Too fast! Did you teleport that car?"
             ];
             baseMessage = crazyMessages[Math.floor(Math.random() * crazyMessages.length)];
         } else if (score >= proScore) {
@@ -690,5 +722,19 @@ class ParkingGame {
 
 // Initialize game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Populate level select dropdown dynamically
+    const levelSelect = document.getElementById('level-select');
+    const numLevels = Level.levelConfigs.length;
+
+    for (let i = 1; i <= numLevels; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        if (i === 1) {
+            option.selected = true;
+        }
+        levelSelect.appendChild(option);
+    }
+
     new ParkingGame();
 });
