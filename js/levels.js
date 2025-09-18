@@ -42,6 +42,17 @@ class Level {
     }
 
     static get levelConfigs() {
+        const Angle = {
+            N: -Math.PI / 2,   // North (up)
+            NE: -Math.PI / 4,  // NorthEast
+            E: 0,              // East (right)
+            SE: Math.PI / 4,   // SouthEast
+            S: Math.PI / 2,    // South (down)
+            SW: Math.PI / 4,   // SouthWest
+            W: Math.PI,        // West (left)
+            NW: -Math.PI / 4,   // NorthWest
+        };
+
         return [
             // Level 1: Simple straight parking
             {
@@ -59,7 +70,7 @@ class Level {
                     right: 365,
                     top: 250,
                     bottom: 350,
-                    angle: -Math.PI / 2 // Face North
+                    angle: Angle.N // Face North
                 },
                 exitArea: {
                     left: 640,
@@ -68,7 +79,7 @@ class Level {
                     bottom: 350
                 },
                 startPosition: { x: 100, y: 300 },
-                startAngle: -Math.PI / 2, // Face North
+                startAngle: Angle.N, // Face North
                 instructions: ['Use the arrow keys to drive (Best on PC/laptop). Park the car inside the yellow area.', 'Excellent! Now drive to the exit!'],
                 proScore: 980
             },
@@ -89,7 +100,7 @@ class Level {
                     right: 350,
                     top: 200,
                     bottom: 300,
-                    angle: -Math.PI / 2 // Face up
+                    angle: Angle.N // Face up
                 },
                 exitArea: {
                     left: 650,
@@ -98,7 +109,7 @@ class Level {
                     bottom: 300
                 },
                 startPosition: { x: 100, y: 250 },
-                startAngle: -Math.PI / 2, // Face North
+                startAngle: Angle.N, // Face North
                 instructions: ['Too easy? Now the parking spot is narrower.', 'Great job! Head to the exit!'],
                 proScore: 970
             },
@@ -127,7 +138,7 @@ class Level {
                     right: 360,
                     top: 100,
                     bottom: 200,
-                    angle: -Math.PI / 2
+                    angle: Angle.N
                 },
                 exitArea: {
                     left: 690,
@@ -136,7 +147,7 @@ class Level {
                     bottom: 350
                 },
                 startPosition: { x: 100, y: 300 },
-                startAngle: -Math.PI / 2,  // Face North
+                startAngle: Angle.N,  // Face North
                 instructions: ['Imaging parking between the parked cars in a parking lot.', 'Well parked! Now exit the car park.'],
                 proScore: 960
             },
@@ -163,7 +174,7 @@ class Level {
                     right: 450,
                     top: 300,
                     bottom: 400,
-                    angle: -Math.PI / 2 // Face up
+                    angle: Angle.N // Face up
                 },
                 exitArea: {
                     left: 650,
@@ -172,7 +183,7 @@ class Level {
                     bottom: 400
                 },
                 startPosition: { x: 100, y: 350 },
-                startAngle: -Math.PI / 2, // Face North
+                startAngle: Angle.N, // Face North
                 instructions: ['Navigate the obstacles to park in the tight space.', 'Success! Proceed to the exit. Watch the wall!'],
                 proScore: 955
             },
@@ -208,7 +219,7 @@ class Level {
                     bottom: 350
                 },
                 startPosition: { x: 150, y: 300 },
-                startAngle: 0, // Face East
+                startAngle: Angle.E, // Face East
                 instructions: ['That was too easy! Now let\'s park between two cars on the side of a street.', 'Perfect! Now drive all the way back to the exit!'],
                 proScore: 890
             },
@@ -243,7 +254,7 @@ class Level {
                     right: 310,
                     top: 150,
                     bottom: 250,
-                    angle: 0 // Supposed to face right but doesn't work
+                    angle: Angle.E // Supposed to face right but doesn't work
                 },
                 exitArea: {
                     left: 650,
@@ -252,7 +263,7 @@ class Level {
                     bottom: 550,
                 },
                 startPosition: { x: 80, y: 420 },
-                startAngle: -Math.PI / 2, // Face North
+                startAngle: Angle.N, // Face North
                 instructions: ['(by Isko) Get the car out of this garage to the other.', 'Nicely done! Brrm brrm! Now see if you can exit.'],
                 proScore: 815
             },
@@ -300,12 +311,12 @@ class Level {
                     bottom: 550,
                 },
                 startPosition: { x: 200, y: 530 },
-                startAngle: 0, // Face east
+                startAngle: Angle.E, // Face east
                 instructions: ['(by Isko) Try parking in the narrow garage.', 'Amazing! Now weave through the maze to the far exit!'],
                 proScore: 760
             },
 
-            // Level 8: by Mimin
+            // Level 8: by Niko
             {
                 boundaries: [
                     { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
@@ -332,10 +343,10 @@ class Level {
                     bottom: 400,
                 },
                 startPosition: { x: 80, y: 200 },
-                startAngle: -Math.PI / 2, // Face North
+                startAngle: Angle.N, // Face North
                 instructions: ['(by Niko) Nice work. Now let\'s relax.', 'Now just let the arrow keys do the work.'],
                 proScore: 975
-            }
+            },
         ];
     }
 
