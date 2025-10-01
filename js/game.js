@@ -604,33 +604,33 @@ class ParkingGame {
 
         // Score tier messages
         let baseMessage = '';
-        if (score >= (1000 - (1000 - proScore) * 0.8)) {
-            // Crazy tier
-            const crazyMessages = [
+        if (score >= (1000 - (1000 - proScore) * 0.8) && collisionCount === 0) {
+            // Legendary tier
+            const legendMessages = [
                 "Unbelievable! You're a parking legend!",
-                "Insane skills — Perfection personified!",
-                "Beyond pro level — Driving wizardry!",
-                "Cosmic parking mastery achieved!",
+                "Insane legendary skills — Perfection personified!",
+                "Way beyond pro level — Driving wizardry!",
+                "Wow! Cosmic parking mastery achieved!",
                 "Wow! Too fast! Did you teleport that car?"
             ];
-            baseMessage = crazyMessages[Math.floor(Math.random() * crazyMessages.length)];
-        } else if (score >= proScore) {
+            baseMessage = legendMessages[Math.floor(Math.random() * legendMessages.length)];
+        } else if (score >= proScore && collisionCount === 0) {
             // Amazing tier
             const amazingMessages = [
-                "Wow, you're an amazing driver! Perfect parking pro!",
-                "Legendary parking skills — Flawless execution!",
-                "Pro level mastery achieved!",
+                "You're an amazing driver! A parking pro!",
+                "Amazing parking skills — Flawless execution!",
+                "Professional level mastery achieved!",
                 "Elite driver status unlocked!",
-                "Textbook perfection!"
+                "Amazing! Textbook perfection!"
             ];
             baseMessage = amazingMessages[Math.floor(Math.random() * amazingMessages.length)];
         } else if (score > proScore * 0.85) {
             // Great tier
             const greatMessages = [
                 "Great job! Solid parking skills.",
-                "That was smooth — Nice work!",
+                "That was great — Nice work!",
                 "Impressive maneuvering!",
-                "Well executed — Professional level!",
+                "Well executed — You're almost like a pro!",
                 "Smooth operator!"
             ];
             baseMessage = greatMessages[Math.floor(Math.random() * greatMessages.length)];
@@ -641,7 +641,7 @@ class ParkingGame {
                 "Not bad — Solid attempt!",
                 "You're getting the hang of it!",
                 "Respectable performance!",
-                "On the right track!"
+                "Good effort! On the right track!"
             ];
             baseMessage = okMessages[Math.floor(Math.random() * okMessages.length)];
         } else if (score > 0) {
@@ -651,7 +651,7 @@ class ParkingGame {
                 "Close call. Sharpen those skills!",
                 "Every pro started somewhere!",
                 "Brave attempt — Progress made!",
-                "Better than nothing!"
+                "Not too bad, better than nothing!"
             ];
             baseMessage = poorMessages[Math.floor(Math.random() * poorMessages.length)];
         } else {
