@@ -70,7 +70,7 @@ class Level {
                     right: 365,
                     top: 250,
                     bottom: 350,
-                    angle: Angle.N // Face North
+                    angle: Angle.N // doesn't work
                 },
                 exitArea: {
                     left: 640,
@@ -79,7 +79,7 @@ class Level {
                     bottom: 350
                 },
                 startPosition: { x: 100, y: 300 },
-                startAngle: Angle.N, // Face North
+                startAngle: Angle.N,
                 instructions: ['Use the arrow keys to drive (Best on PC/laptop). Park the car inside the yellow area.', 'Excellent! Now drive to the exit!'],
                 proScore: 980
             },
@@ -100,7 +100,6 @@ class Level {
                     right: 350,
                     top: 200,
                     bottom: 300,
-                    angle: Angle.N // Face up
                 },
                 exitArea: {
                     left: 650,
@@ -109,7 +108,7 @@ class Level {
                     bottom: 300
                 },
                 startPosition: { x: 100, y: 250 },
-                startAngle: Angle.N, // Face North
+                startAngle: Angle.N,
                 instructions: ['Too easy? Now the parking spot is narrower.', 'Great job! Head to the exit!'],
                 proScore: 970
             },
@@ -138,7 +137,6 @@ class Level {
                     right: 360,
                     top: 100,
                     bottom: 200,
-                    angle: Angle.N
                 },
                 exitArea: {
                     left: 690,
@@ -147,7 +145,7 @@ class Level {
                     bottom: 350
                 },
                 startPosition: { x: 100, y: 300 },
-                startAngle: Angle.N,  // Face North
+                startAngle: Angle.N,
                 instructions: ['Imaging parking between the parked cars in a parking lot.', 'Well parked! Now exit the car park.'],
                 proScore: 960
             },
@@ -174,7 +172,7 @@ class Level {
                     right: 450,
                     top: 300,
                     bottom: 400,
-                    angle: Angle.N // Face up
+                    angle: Angle.N // doesn't work
                 },
                 exitArea: {
                     left: 650,
@@ -183,7 +181,7 @@ class Level {
                     bottom: 400
                 },
                 startPosition: { x: 100, y: 350 },
-                startAngle: Angle.N, // Face North
+                startAngle: Angle.N,
                 instructions: ['Navigate the obstacles to park in the tight space.', 'Success! Proceed to the exit. Watch the wall!'],
                 proScore: 955
             },
@@ -219,7 +217,7 @@ class Level {
                     bottom: 350
                 },
                 startPosition: { x: 150, y: 300 },
-                startAngle: Angle.E, // Face East
+                startAngle: Angle.E,
                 instructions: ['That was too easy! Now let\'s park between two cars on the side of a street.', 'Perfect! Now drive all the way back to the exit!'],
                 proScore: 890
             },
@@ -346,6 +344,37 @@ class Level {
                 startAngle: Angle.N, // Face North
                 instructions: ['(by Niko) Nice work. Now let\'s relax.', 'Now just let the arrow keys do the work.'],
                 proScore: 975
+            },
+
+            // Level 9: by Frinli
+            {
+                boundaries: [
+                    { left: 0, right: 800, top: 0, bottom: 50 }, // Top wall
+                    { left: 0, right: 50, top: 0, bottom: 600 }, // Left wall
+                    { left: 750, right: 800, top: 0, bottom: 600 }, // Right wall
+                    { left: 0, right: 800, top: 550, bottom: 600 }, // Bottom wall
+
+                    // Obstacles
+                    { left: 150, right: 250, top: 200, bottom: 300 },
+                    { left: 400, right: 350, top: 400, bottom: 80 },
+                    { left: 400, right: 250, top: 80, bottom: 7 },
+                ],
+                parkingSpot: {
+                    left: 300,
+                    right: 350,
+                    top: 200,
+                    bottom: 300,
+                },
+                exitArea: {
+                    left: 650,
+                    right: 710,
+                    top: 200,
+                    bottom: 300
+                },
+                startPosition: { x: 100, y: 250 },
+                startAngle: Angle.N, // Face North
+                instructions: ['(by Frinli) Be careful but easy~', 'Now exit'],
+                proScore: 970
             },
         ];
     }
